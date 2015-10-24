@@ -45,7 +45,7 @@ class Node():
         else:
             new_table = TimeTable.load(json.loads(data['table']))
             events = data['events']
-    
+
             new_events =[]
             for event in events:
                 new_events.append( Event.load(json.loads(event) ))
@@ -58,12 +58,12 @@ class Node():
                         self.events.append(event)
                     elif event.type == MessageTypes.Insert:
                         send_failure(event)
-                    
+
 
             self.table.sync(new_table)
-   
 
-    def send(self, _id):
+
+    def send(self, _id, event=None):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             data = "data"
@@ -77,7 +77,10 @@ class Node():
             # Add To EntrySet
         except:
             # Node Down cancel conflict
-            remove_event
+            if not event == None:
+                event.type = MessageTypes.Delete
+                event = event.apply(self.entry_set)
+                self.events.append(event)
             pass
 
         finally:
@@ -120,20 +123,20 @@ if __name__ == "__main__":
         print "[v] View Appointments"
         print "[a] Add Appointment"
         print "[d] Delete Appointment"
-    
+
         resp = raw_input("Choice: ").lower()
         entries = list(node.entry_set)
         if resp == 'v':
             i = 1
             for entry in entries:
                 print "" + i + ") " + entry.__repr__()
-            
+
         elif resp == 'a':
             part = raw_input("Node Ids of participants (comma seperated): ").split(",")
             nam = raw_input("Event name: ")
             day = raw_input("Day: ")
             time = raw_input("Time: ")
-            
+
             entry = Entry(part, nam, day, time)
             event = Event(Event.MessageType.Insert, time.time(), node, entry)
             data = {
@@ -141,8 +144,8 @@ if __name__ == "__main__":
                 'events': [event.to_JSON()],
             }
             node.send(json.dumps(data))
-            
-        
+
+
         elif resp == 'd':
             resp = int(raw_input("Enter Appointment number: "))
             entry = node.entries[resp]
@@ -153,8 +156,3 @@ if __name__ == "__main__":
             }
 
             node.send(json.dumps(data))
-        
-        
-        
-        
-    
