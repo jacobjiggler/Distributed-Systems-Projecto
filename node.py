@@ -42,7 +42,7 @@ class Node():
 
         if data['type'] == "failure":
             rec_failure(data)
-        else:
+        elif data['type'] == 'sync':
             new_table = UNSERIALIZE_TABLE(data['table'])
             new_events = UNSERIALIZE_EVENTS(data['events'])
 
@@ -55,23 +55,17 @@ class Node():
                     elif event.type == MessageTypes.Insert:
                         send_failure(event)
             self.table.sync(new_table)
+        else:
+            raise Exception("Message received did not have a valid type")
 
     def send(self, _id, data):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        try:
-            print("Sending Data from client")
-            # Connect to server and send data
-            sock.connect((Node.ips[_id], 6000))
-            sock.sendall(data)
 
-            # Receive data from the server and shut down
-            received = sock.recv(1024)
-            # Add To EntrySet
-        except:
-            pass
-            # Node Down cancel conflict
-        finally:
-            sock.close()
+        print("Sending Data from client")
+        # Connect to server and send data
+        sock.connect((Node.ips[_id], 6000))
+        sock.sendall(data)
+        sock.close()
 
     def send_failure(self, event):
         dest = Node.ips[event.node]
@@ -106,6 +100,7 @@ class Node():
                 partial.append(event.to_JSON())
 
         data = {
+            'type': 'sync',
             'table': self.table.to_JSON(),
             'events': partial,
         }
