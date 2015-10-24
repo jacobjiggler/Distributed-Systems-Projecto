@@ -1,8 +1,10 @@
 import time
 import datetime
+import json
 
 class Entry():
-    def __init__(self, participants, name, day, start):
+
+    def __init__(self, participants=None, name = None, day=None, start=None):
         self.participants = participants
         self.name = name
         self.day = day
@@ -19,6 +21,18 @@ class Entry():
         return (not self.__eq__(other))
     def __hash__(self):
         return hash(self.__repr__())
+
+    def to_JSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__,
+            sort_keys=True)
+
+    @staticmethod
+    def load(js):
+        a = Entry()
+        a.__dict__ = js
+        return a
+
+
 
 
 
@@ -43,3 +57,13 @@ class EntrySet():
 
     def delete(self, entry):
         calendar.remove(entry)
+
+    def to_JSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__,
+            sort_keys=True)
+
+    @staticmethod
+    def load(js):
+        a = EntrySet()
+        a.__dict__ = js
+        return a
