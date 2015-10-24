@@ -2,6 +2,8 @@ import time
 import datetime
 import json
 
+from event import Event
+
 class Entry():
 
     def __init__(self, participants=None, name = None, day=None, start=None):
@@ -40,7 +42,9 @@ class EntrySet():
     def __init__(self):
         self.calendar = []
 
-
+    def __repr__(self):
+        strs = map(str, self.calendar)
+        return '\n'.join(strs)
 
     #log file exists with entries
     def create_from_log(self):
