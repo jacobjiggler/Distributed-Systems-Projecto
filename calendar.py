@@ -49,7 +49,7 @@ class EntrySet():
         #using timetable and the log file
 
     def add(self, entry):
-        if (calendar.find(entry)):
+        if calendar.find(entry):
             return false
         else:
             calendar.append(entry)

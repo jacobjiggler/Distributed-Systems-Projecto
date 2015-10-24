@@ -43,9 +43,9 @@ class Node():
         new_table = UNSERIALIZE_TABLE(data['table'])
         new_events = UNSERIALIZE_EVENTS(data['events'])
 
-        # For all events this node doesn't have, made modifications
+        # For all events this node doesn't have, make modifications
         for event in new_events:
-            if not self.has_event(event, self.node):
+            if not self.has_event(event, self.id):
                 res = event.apply(self.entry_set)
                 if res:
                     self.events.append(event)
