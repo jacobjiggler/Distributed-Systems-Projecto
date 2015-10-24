@@ -3,16 +3,19 @@ class MessageTypes:
     Insert, Delete = range(2)
 
 class Event:
-    def __init__(self, typ, time, node):
+    def __init__(self, typ, time, node, entry):
         self.type = typ
         self.time = time
         self.node = node
+        self.entry = entry
 
-def has_record(events, table, node_id, event):
-    return table.get(node_id, event.node) >= event.time
+    def apply(entry_set):
+        raise Exception("Event is an abstract base")
 
-def send_to_node(events, table, node_id):
-    partial = []
-    for event in events:
-        if not has_record(events,  table, node_id, event)
-            partial.append(event)
+class Insert(Event):
+    def apply(entry_set):
+        entries.add(entry)
+
+class Delete(Event):
+    def apply(entry_set):
+        entries.delete(entry)

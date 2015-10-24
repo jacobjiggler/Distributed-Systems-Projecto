@@ -24,23 +24,33 @@ class Node():
         self.table = TimeTable(1)
         self.events = []
 
-    def receive(self, data):
-        #do things with raw datums
-        print "Received Data"
-        print data
+    # Expect data in the form:
+    # {'table': <serialized table>, 'events': <array of events>}
+    def receive(self, raw):
+        # unserialize the data, somehow
+        data = json.loads(raw)
+
+        new_table = UNSERIALIZE_TABLE(data['table'])
+        new_events = UNSERIALIZE_EVENTS(data['events'])
+
+        # For all events this node doesn't have, made modifications
+        for event in new_events:
+            if not self.has_event(event, self.node):
+                event.apply(self.entry_set)
+
 
     def send(self, ip):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             data = "data"
-            print "Sending Data from client"
+            print("Sending Data from client")
             # Connect to server and send data
             sock.connect((ip, 6000))
             sock.sendall(data + "\n")
 
             # Receive data from the server and shut down
             received = sock.recv(1024)
-            print "ACK: " + received
+            print("ACK: " + received)
         finally:
             sock.close()
 
@@ -51,7 +61,7 @@ class Node():
     def send_to_node(self, node_id):
         partial = []
         for event in self.events:
-            if not self.has_event(event, node_id)
+            if not self.has_event(event, node_id):
                 partial.append(event)
 
         data = {
