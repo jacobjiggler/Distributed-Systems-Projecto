@@ -11,7 +11,7 @@ class Entry():
         self.start = start
 
     def __repr__(self):
-        return "Entry(%s, %s, %s, %s)" % (self.participants, self.name, self.day, self.start)
+        return "Name: %s\nParticipants: %s\nDay: %s\nTime: %s)" % (self.name, self.participants, self.day, self.start)
     def __eq__(self, other):
         if isinstance(other, Item):
             return ((self.participants == other.participants) and (self.name == other.name) and (self.day == other.day) and (self.start == other.start))

@@ -4,6 +4,7 @@ from sys import argv
 from calendar import *
 from time_table import *
 import socket
+import time
 import calendar
 import os
 node = None
@@ -39,12 +40,15 @@ class Node():
     def receive(self, raw):
         # unserialize the data, somehow
         data = json.loads(raw)
-
         if data['type'] == "failure":
             rec_failure(data)
-        elif data['type'] == 'sync':
-            new_table = UNSERIALIZE_TABLE(data['table'])
-            new_events = UNSERIALIZE_EVENTS(data['events'])
+        else:
+            new_table = TimeTable.load(json.loads(data['table']))
+            events = data['events']
+    
+            new_events =[]
+            for event in events:
+                new_events.append( Event.load(json.loads(event) ))
 
             # For all events this node doesn't have, make modifications
             for event in new_events:
@@ -54,21 +58,31 @@ class Node():
                         self.events.append(event)
                     elif event.type == MessageTypes.Insert:
                         send_failure(event)
+                    
+
             self.table.sync(new_table)
-        else:
-            raise Exception("Message received did not have a valid type")
+   
 
-    def send(self, _id, data):
+    def send(self, _id):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            data = "data"
+            print("Sending Data from client")
+            # Connect to server and send data
+            sock.connect((Node.ips[_id], 6000))
+            sock.sendall(data + "\n")
 
-        print("Sending Data from client")
-        # Connect to server and send data
-        sock.connect((Node.ips[_id], 6000))
-        sock.sendall(data)
-        sock.close()
+            # Receive data from the server and shut down
+            received = sock.recv(1024)
+            # Add To EntrySet
+        except:
+            pass
+            # Node Down cancel conflict
+        finally:
+            sock.close()
 
     def send_failure(self, event):
-        dest = Node.ips[event.node]
+        #grab id from event
 
         print("Sending Failure command")
         data = {
@@ -76,18 +90,9 @@ class Node():
             'event': event.to_JSON()
         }
         json.dumps(data)
-        self.send(dest, data)
-
     def rec_failure(self, data):
         data = json.loads(data)
         event = Event.load(json.loads(data['event']))
-
-        # create a delete event for this entry
-        self.events.append(Event(MessageTypes.Delete, time.time(), self.id, event.entry))
-
-        # Send the delete event to all nodes
-        for node_id in Node.ids:
-            self.send_to_node(node_id)
 
     # Check if a node has a certain event
     def has_event(self,event, node_id):
@@ -100,13 +105,54 @@ class Node():
                 partial.append(event.to_JSON())
 
         data = {
-            'type': 'sync',
             'table': self.table.to_JSON(),
             'events': partial,
         }
 
-        self.send(node_id, json.dumps(data))
+        self.send(json.dumps(data))
 
 if __name__ == "__main__":
     Node.ips = open('ip', 'r').read().split("\n")[0:4]
     node = Node(argv[1])
+    if (len(argv) == 2):
+        print "[v] View Appointments"
+        print "[a] Add Appointment"
+        print "[d] Delete Appointment"
+    
+        resp = raw_input("Choice: ").lower()
+        entries = list(node.entry_set)
+        if resp == 'v':
+            i = 1
+            for entry in entries:
+                print "" + i + ") " + entry.__repr__()
+            
+        elif resp == 'a':
+            part = raw_input("Node Ids of participants (comma seperated): ").split(",")
+            nam = raw_input("Event name: ")
+            day = raw_input("Day: ")
+            time = raw_input("Time: ")
+            
+            entry = Entry(part, nam, day, time)
+            event = Event(Event.MessageType.Insert, time.time(), node, entry)
+            data = {
+                'table': node.table.to_JSON(),
+                'events': [event.to_JSON()],
+            }
+            node.send(json.dumps(data))
+            
+        
+        elif resp == 'd':
+            resp = int(raw_input("Enter Appointment number: "))
+            entry = node.entries[resp]
+            event = Event(Event.MessageType.Delete, time.time(), node, entry)
+            data = {
+                'table': node.table.to_JSON(),
+                'events': [event.to_JSON()],
+            }
+
+            node.send(json.dumps(data))
+        
+        
+        
+        
+    
