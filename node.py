@@ -21,13 +21,15 @@ class Node():
     def __init__(self, _id):
         self.id = int(_id)
         self.ip = Node.ips[self.id]
-
+        if os.path.isfile("log.dat"):
+            self.entry_set.create_from_log()
+        self.log = open("log.txt", "a")
         listener = SocketServer.TCPServer((self.ip, 6000), MyTCPHandler)
         self.thread = Thread(target = listener.serve_forever)
         self.thread.start()
         self.entry_set = calendar.EntrySet()
-        if os.path.isfile("log.dat"):
-            self.entry_set.create_from_log()
+
+
 
 
 
@@ -56,6 +58,10 @@ class Node():
                     res = event.apply(self.entry_set)
                     if res:
                         self.events.append(event)
+                        data = {
+                            'events': [event.to_JSON()],
+                        }
+                        log.write(json.dumps(data))
                     elif event.type == MessageTypes.Insert:
                         send_failure(event)
 
