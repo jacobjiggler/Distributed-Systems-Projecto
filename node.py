@@ -23,6 +23,10 @@ class Node():
         self.thread = Thread(target = listener.serve_forever)
         self.thread.start()
 
+    def init_calendar(self):
+        self.table = TimeTable(1)
+        self.events = []
+
     def receive(self, data):
         #do things with raw datums
         print "Received Data"
@@ -46,6 +50,15 @@ class Node():
         finally:
             sock.close()
 
+    # Check if a node has a certain event
+    def has_event(event, node_id):
+        return self.table.get(node_id, event.node) >= event.time
+
+    def send_to_node(node_id):
+        partial = []
+        for event in self.events:
+            if not self.has_event(event, node_id)
+                partial.append(event)
 
 if __name__ == "__main__":
     Node.ips = open('ip', 'r').read().split("\n")[0:4]

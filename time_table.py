@@ -17,3 +17,6 @@ class TimeTable(object):
     # Call this when a node performs a local "insert" or "delete" operation
     def update(node, count):
         self.table[node][node] = count
+
+    def get(i, j):
+        return self.table[i][j]
