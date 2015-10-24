@@ -69,8 +69,10 @@ class Node():
             received = sock.recv(1024)
             # Add To EntrySet
         except:
-            pass
             # Node Down cancel conflict
+            remove_event
+            pass
+
         finally:
             sock.close()
 

@@ -46,7 +46,7 @@ class EntrySet():
     def create_from_log(self):
         self.calendar = []
         #create calendar from it
-        #using timetable and the log file
+        #using log file
 
     def add(self, entry):
         if calendar.find(entry):
