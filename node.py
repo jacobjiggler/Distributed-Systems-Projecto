@@ -4,6 +4,7 @@ from sys import argv
 from calendar import *
 from time_table import *
 import socket
+import time
 import calendar
 import os
 node = None
@@ -113,21 +114,44 @@ class Node():
 if __name__ == "__main__":
     Node.ips = open('ip', 'r').read().split("\n")[0:4]
     node = Node(argv[1])
+    if (len(argv) == 2):
+        print "[v] View Appointments"
+        print "[a] Add Appointment"
+        print "[d] Delete Appointment"
     
-    print "[v] View Appointments"
-    print "[a] Add Appointment"
-    print "[d] Delete Appointment"
-    
-    resp = raw_input("Choice: ").lower()
-    if resp == 'v':
-        for entry in node.entry_set:
-            print entry
+        resp = raw_input("Choice: ").lower()
+        entries = list(node.entry_set)
+        if resp == 'v':
+            i = 1
+            for entry in entries:
+                print "" + i + ") " + entry.__repr__()
             
-    elif resp == 'a':
-        pass
+        elif resp == 'a':
+            part = raw_input("Node Ids of participants (comma seperated): ").split(",")
+            nam = raw_input("Event name: ")
+            day = raw_input("Day: ")
+            time = raw_input("Time: ")
+            
+            entry = Entry(part, nam, day, time)
+            event = Event(Event.MessageType.Insert, time.time(), node, entry)
+            data = {
+                'table': node.table.to_JSON(),
+                'events': [event.to_JSON()],
+            }
+            node.send(json.dumps(data))
+            
         
-    elif resp == 'd':
-        resp = raw_input("Enter Appointment number: ")
+        elif resp == 'd':
+            resp = int(raw_input("Enter Appointment number: "))
+            entry = node.entries[resp]
+            event = Event(Event.MessageType.Delete, time.time(), node, entry)
+            data = {
+                'table': node.table.to_JSON(),
+                'events': [event.to_JSON()],
+            }
+
+            node.send(json.dumps(data))
+        
         
         
         
