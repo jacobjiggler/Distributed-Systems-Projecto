@@ -9,6 +9,16 @@ class Event:
         self.node = node
         self.entry = entry
 
+    def to_JSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__,
+            sort_keys=True)
+
+    @staticmethod
+    def load(js):
+        a = Event()
+        a.__dict__ = js
+        return a
+
     def apply(entry_set):
         raise Exception("Event is an abstract base")
 
@@ -19,3 +29,4 @@ class Insert(Event):
 class Delete(Event):
     def apply(entry_set):
         entries.delete(entry)
+
