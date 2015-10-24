@@ -3,7 +3,7 @@ import datetime
 import json
 
 class Entry():
-        
+
     def __init__(self, participants=None, name = None, day=None, start=None):
         self.participants = participants
         self.name = name
@@ -19,24 +19,22 @@ class Entry():
             return False
     def __ne__(self, other):
         return (not self.__eq__(other))
-    def __lt__(self, other):
-        return
     def __hash__(self):
         return hash(self.__repr__())
 
     def to_JSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__, 
+        return json.dumps(self, default=lambda o: o.__dict__,
             sort_keys=True)
-            
+
     @staticmethod
     def load(js):
         a = Entry()
         a.__dict__ = js
         return a
-            
-    
-        
-        
+
+
+
+
 
 class EntrySet():
     def __init__(self):
@@ -51,18 +49,21 @@ class EntrySet():
         #using timetable and the log file
 
     def add(self, entry):
-        calendar[0] = 1
+        if (calendar.find(entry)):
+            return false
+        else:
+            calendar.append(entry)
+            return true
 
     def delete(self, entry):
-        pass
-    
+        calendar.remove(entry)
+
     def to_JSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__, 
+        return json.dumps(self, default=lambda o: o.__dict__,
             sort_keys=True)
-            
+
     @staticmethod
     def load(js):
         a = EntrySet()
         a.__dict__ = js
         return a
-    
