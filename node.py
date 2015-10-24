@@ -24,9 +24,9 @@ class Node():
         listener = SocketServer.TCPServer((self.ip, 6000), MyTCPHandler)
         self.thread = Thread(target = listener.serve_forever)
         self.thread.start()
-        dic = calendar.EntrySet()
-        if (os.path.isfile("log.dat")):
-            dic.create_from_log()
+        self.entry_set = calendar.EntrySet()
+        if os.path.isfile("log.dat"):
+            self.entry_set.create_from_log()
 
 
 
