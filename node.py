@@ -56,14 +56,13 @@ class Node():
                         send_failure(event)
             self.table.sync(new_table)
 
-    def send(self, _id):
+    def send(self, _id, data):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
-            data = "data"
             print("Sending Data from client")
             # Connect to server and send data
             sock.connect((Node.ips[_id], 6000))
-            sock.sendall(data + "\n")
+            sock.sendall(data)
 
             # Receive data from the server and shut down
             received = sock.recv(1024)
@@ -75,7 +74,7 @@ class Node():
             sock.close()
 
     def send_failure(self, event):
-        #grab id from event
+        dest = Node.ips[event.node]
 
         print("Sending Failure command")
         data = {
@@ -83,9 +82,18 @@ class Node():
             'event': event.to_JSON()
         }
         json.dumps(data)
+        self.send(dest, data)
+
     def rec_failure(self, data):
         data = json.loads(data)
         event = Event.load(json.loads(data['event']))
+
+        # create a delete event for this entry
+        self.events.append(Event(MessageTypes.Delete, time.time(), self.id, event.entry))
+
+        # Send the delete event to all nodes
+        for node_id in Node.ids:
+            self.send_to_node(node_id)
 
     # Check if a node has a certain event
     def has_event(self,event, node_id):
@@ -102,7 +110,7 @@ class Node():
             'events': partial,
         }
 
-        self.send(json.dumps(data))
+        self.send(node_id, json.dumps(data))
 
 if __name__ == "__main__":
     Node.ips = open('ip', 'r').read().split("\n")[0:4]
