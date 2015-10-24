@@ -24,7 +24,7 @@ class Node():
         dic = calendar.EntrySet()
         if (os.path.isfile("log.dat")):
             dic.create_from_log()
-        file = open('log.dat', 'a')
+
 
 
     def init_calendar(self):

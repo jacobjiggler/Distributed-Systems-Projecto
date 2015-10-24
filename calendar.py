@@ -17,8 +17,6 @@ class Entry():
             return False
     def __ne__(self, other):
         return (not self.__eq__(other))
-    def __lt__(self, other):
-        return
     def __hash__(self):
         return hash(self.__repr__())
 
@@ -37,7 +35,11 @@ class EntrySet():
         #using timetable and the log file
 
     def add(self, entry):
-        calendar[0] = 1
+        if (calendar.find(entry)):
+            return false
+        else:
+            calendar.append(entry)
+            return true
 
     def delete(self, entry):
-        calendar[0] = 1
+        calendar.remove(entry)
