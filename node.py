@@ -40,8 +40,12 @@ class Node():
         # unserialize the data, somehow
         data = json.loads(raw)
 
-        new_table = UNSERIALIZE_TABLE(data['table'])
-        new_events = UNSERIALIZE_EVENTS(data['events'])
+        new_table = TimeTable.load(json.loads(data['table']))
+        events = data['events']
+        
+        new_events =[]
+        for event in events:
+            new_events.append( Events.load(json.loads(event) ))
 
         # For all events this node doesn't have, made modifications
         for event in new_events:
@@ -75,10 +79,10 @@ class Node():
         partial = []
         for event in self.events:
             if not self.has_event(event, node_id):
-                partial.append(event)
+                partial.append(event.to_JSON())
 
         data = {
-            'table': self.table,
+            'table': self.table.to_JSON(),
             'events': partial,
         }
 
