@@ -18,9 +18,9 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
 class Node():
     ips = []
     def __init__(self, _id):
-        self.id = _id
+        self.id = int(_id)
         self.ip = Node.ips[self.id]
-        
+
         listener = SocketServer.TCPServer((self.ip, 6000), MyTCPHandler)
         self.thread = Thread(target = listener.serve_forever)
         self.thread.start()
@@ -40,17 +40,23 @@ class Node():
         # unserialize the data, somehow
         data = json.loads(raw)
 
-        new_table = UNSERIALIZE_TABLE(data['table'])
-        new_events = UNSERIALIZE_EVENTS(data['events'])
+        if data['type'] == "failure":
+            rec_failure(data)
+        else:
+            new_table = UNSERIALIZE_TABLE(data['table'])
+            new_events = UNSERIALIZE_EVENTS(data['events'])
 
-        # For all events this node doesn't have, make modifications
-        for event in new_events:
-            if not self.has_event(event, self.id):
-                res = event.apply(self.entry_set)
-                if res:
-                    self.events.append(event)
+            # For all events this node doesn't have, make modifications
+            for event in new_events:
+                if not self.has_event(event, self.id):
+                    res = event.apply(self.entry_set)
+                    if res:
+                        self.events.append(event)
+                    elif event.type == MessageTypes.Insert:
+                        send_failure(event)
 
-        self.table.sync(new_table)
+
+            self.table.sync(new_table)
 
     def send(self, _id):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -69,6 +75,19 @@ class Node():
             # Node Down cancel conflict
         finally:
             sock.close()
+
+    def send_failure(self, event):
+        #grab id from event
+
+        print("Sending Failure command")
+        data = {
+            'type': 'failure',
+            'event': event.to_JSON()
+        }
+        json.dumps(data)
+    def rec_failure(self, data):
+        data = json.loads(data)
+        event = Event.load(json.loads(data['event']))
 
     # Check if a node has a certain event
     def has_event(self,event, node_id):
