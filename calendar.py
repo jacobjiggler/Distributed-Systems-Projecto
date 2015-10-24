@@ -56,7 +56,11 @@ class EntrySet():
             return true
 
     def delete(self, entry):
+    if (calendar.find(entry)):
         calendar.remove(entry)
+        return true
+    else:
+        return false
 
     def to_JSON(self):
         return json.dumps(self, default=lambda o: o.__dict__,
