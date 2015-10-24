@@ -8,11 +8,23 @@ class Event:
         self.time = time
         self.node = node
 
-def has_record(events, table, node_id, event):
-    return table.get(node_id, event.node) >= event.time
+    def has_record(self,events, table, node_id, event):
+        return table.get(node_id, event.node) >= event.time
 
-def send_to_node(events, table, node_id):
-    partial = []
-    for event in events:
-        if not has_record(events,  table, node_id, event)
-            partial.append(event)
+    def send_to_node(self, events, table, node_id):
+        partial = []
+        for event in events:
+            if not has_record(events,  table, node_id, event)
+                partial.append(event)
+                
+    def to_JSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, 
+            sort_keys=True)
+            
+    @staticmethod
+    def load(js):
+        a = Event()
+        a.__dict__ = js
+        return a
+    
+

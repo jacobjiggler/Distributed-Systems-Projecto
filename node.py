@@ -51,10 +51,10 @@ class Node():
             sock.close()
 
     # Check if a node has a certain event
-    def has_event(event, node_id):
+    def has_event(self,event, node_id):
         return self.table.get(node_id, event.node) >= event.time
 
-    def send_to_node(node_id):
+    def send_to_node(self, node_id):
         partial = []
         for event in self.events:
             if not self.has_event(event, node_id)
