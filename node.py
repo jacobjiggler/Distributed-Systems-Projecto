@@ -4,6 +4,7 @@ from sys import argv
 from calendar import *
 from time_table import *
 import socket
+import time
 import calendar
 import os
 node = None
@@ -39,12 +40,15 @@ class Node():
     def receive(self, raw):
         # unserialize the data, somehow
         data = json.loads(raw)
-
         if data['type'] == "failure":
             rec_failure(data)
         else:
-            new_table = UNSERIALIZE_TABLE(data['table'])
-            new_events = UNSERIALIZE_EVENTS(data['events'])
+            new_table = TimeTable.load(json.loads(data['table']))
+            events = data['events']
+    
+            new_events =[]
+            for event in events:
+                new_events.append( Event.load(json.loads(event) ))
 
             # For all events this node doesn't have, make modifications
             for event in new_events:
@@ -54,7 +58,10 @@ class Node():
                         self.events.append(event)
                     elif event.type == MessageTypes.Insert:
                         send_failure(event)
+                    
+
             self.table.sync(new_table)
+   
 
     def send(self, _id):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -109,3 +116,45 @@ class Node():
 if __name__ == "__main__":
     Node.ips = open('ip', 'r').read().split("\n")[0:4]
     node = Node(argv[1])
+    if (len(argv) == 2):
+        print "[v] View Appointments"
+        print "[a] Add Appointment"
+        print "[d] Delete Appointment"
+    
+        resp = raw_input("Choice: ").lower()
+        entries = list(node.entry_set)
+        if resp == 'v':
+            i = 1
+            for entry in entries:
+                print "" + i + ") " + entry.__repr__()
+            
+        elif resp == 'a':
+            part = raw_input("Node Ids of participants (comma seperated): ").split(",")
+            nam = raw_input("Event name: ")
+            day = raw_input("Day: ")
+            time = raw_input("Time: ")
+            
+            entry = Entry(part, nam, day, time)
+            event = Event(Event.MessageType.Insert, time.time(), node, entry)
+            data = {
+                'table': node.table.to_JSON(),
+                'events': [event.to_JSON()],
+            }
+            node.send(json.dumps(data))
+            
+        
+        elif resp == 'd':
+            resp = int(raw_input("Enter Appointment number: "))
+            entry = node.entries[resp]
+            event = Event(Event.MessageType.Delete, time.time(), node, entry)
+            data = {
+                'table': node.table.to_JSON(),
+                'events': [event.to_JSON()],
+            }
+
+            node.send(json.dumps(data))
+        
+        
+        
+        
+    
