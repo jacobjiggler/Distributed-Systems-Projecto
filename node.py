@@ -13,7 +13,6 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         if node:
             node.receive(self.data)
 
-
 class Node():
     def __init__(self, ip):
         self.ip = ip
@@ -46,11 +45,3 @@ if __name__ == "__main__":
     node = Node(argv[1])
     dic = EntrySet()
 
-class EntrySet():
-    def __init__(self):
-        self.calendar = []
-
-    def add(self, entry):
-        calendar. = 1
-
-    def delete(self, entry):
