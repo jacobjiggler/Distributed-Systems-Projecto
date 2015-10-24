@@ -18,15 +18,15 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
 class Node():
     ips = []
     def __init__(self, _id):
-        self.id = _id
+        self.id = int(_id)
         self.ip = Node.ips[self.id]
-        
+
         listener = SocketServer.TCPServer((self.ip, 6000), MyTCPHandler)
         self.thread = Thread(target = listener.serve_forever)
         self.thread.start()
         self.entry_set = calendar.EntrySet()
-        if (os.path.isfile("log.dat")):
-            dic.create_from_log()
+        if os.path.isfile("log.dat"):
+            self.entry_set.create_from_log()
 
 
 
@@ -39,22 +39,28 @@ class Node():
     def receive(self, raw):
         # unserialize the data, somehow
         data = json.loads(raw)
+        if data['type'] == "failure":
+            rec_failure(data)
+        else:
+            new_table = TimeTable.load(json.loads(data['table']))
+            events = data['events']
+    
+            new_events =[]
+            for event in events:
+                new_events.append( Event.load(json.loads(event) ))
 
-        new_table = TimeTable.load(json.loads(data['table']))
-        events = data['events']
-        
-        new_events =[]
-        for event in events:
-            new_events.append( Event.load(json.loads(event) ))
+            # For all events this node doesn't have, make modifications
+            for event in new_events:
+                if not self.has_event(event, self.id):
+                    res = event.apply(self.entry_set)
+                    if res:
+                        self.events.append(event)
+                    elif event.type == MessageTypes.Insert:
+                        send_failure(event)
+                    
 
-        # For all events this node doesn't have, make modifications
-        for event in new_events:
-            if not self.has_event(event, self.id):
-                res = event.apply(self.entry_set)
-                if res:
-                    self.events.append(event)
-
-        self.table.sync(new_table)
+            self.table.sync(new_table)
+   
 
     def send(self, _id):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -73,6 +79,19 @@ class Node():
             # Node Down cancel conflict
         finally:
             sock.close()
+
+    def send_failure(self, event):
+        #grab id from event
+
+        print("Sending Failure command")
+        data = {
+            'type': 'failure',
+            'event': event.to_JSON()
+        }
+        json.dumps(data)
+    def rec_failure(self, data):
+        data = json.loads(data)
+        event = Event.load(json.loads(data['event']))
 
     # Check if a node has a certain event
     def has_event(self,event, node_id):
