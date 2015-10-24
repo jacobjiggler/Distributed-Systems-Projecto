@@ -20,10 +20,10 @@ class Event:
         a.__dict__ = js
         return a
 
-    def apply(entry_set):
+    def apply(self, entry_set):
         if self.type == MessageTypes.Insert:
-            return entries.add(entry)
+            return entry_set.add(self.entry)
         elif self.type == MessageTypes.Delete:
-            return entries.delete(entry)
+            return entry_set.delete(self.entry)
 
         raise Exception("Event was not one of the types")

@@ -134,6 +134,7 @@ class Node():
 
     def add_entry(self, entry):
         event = Event(MessageTypes.Insert, time.time(), self.id, entry)
+        event.apply(self.entry_set)
         self.events.append(event)
 
         for id in entry.participants:
