@@ -24,7 +24,7 @@ class Node():
         listener = SocketServer.TCPServer((self.ip, 6000), MyTCPHandler)
         self.thread = Thread(target = listener.serve_forever)
         self.thread.start()
-        dic = calendar.EntrySet()
+        self.entry_set = calendar.EntrySet()
         if (os.path.isfile("log.dat")):
             dic.create_from_log()
 
@@ -45,7 +45,7 @@ class Node():
         
         new_events =[]
         for event in events:
-            new_events.append( Events.load(json.loads(event) ))
+            new_events.append( Event.load(json.loads(event) ))
 
         # For all events this node doesn't have, make modifications
         for event in new_events:
@@ -94,3 +94,22 @@ class Node():
 if __name__ == "__main__":
     Node.ips = open('ip', 'r').read().split("\n")[0:4]
     node = Node(argv[1])
+    
+    print "[v] View Appointments"
+    print "[a] Add Appointment"
+    print "[d] Delete Appointment"
+    
+    resp = raw_input("Choice: ").lower()
+    if resp == 'v':
+        for entry in node.entry_set:
+            print entry
+            
+    elif resp == 'a':
+        pass
+        
+    elif resp == 'd':
+        resp = raw_input("Enter Appointment number: ")
+        
+        
+        
+    
