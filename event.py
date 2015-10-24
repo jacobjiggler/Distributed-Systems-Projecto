@@ -21,13 +21,9 @@ class Event:
         return a
 
     def apply(entry_set):
-        raise Exception("Event is an abstract base")
+        if self.type == MessageTypes.Insert:
+            return entries.add(entry)
+        elif self.type == MessageTypes.Delete:
+            return entries.delete(entry)
 
-class Insert(Event):
-    def apply(entry_set):
-        entries.add(entry)
-
-class Delete(Event):
-    def apply(entry_set):
-        entries.delete(entry)
-
+        raise Exception("Event was not one of the types")

@@ -27,7 +27,7 @@ class Node():
         dic = calendar.EntrySet()
         if (os.path.isfile("log.dat")):
             dic.create_from_log()
-        file = open('log.dat', 'a')
+
 
 
     def init_calendar(self):
@@ -47,11 +47,14 @@ class Node():
         for event in events:
             new_events.append( Events.load(json.loads(event) ))
 
-        # For all events this node doesn't have, made modifications
+        # For all events this node doesn't have, make modifications
         for event in new_events:
-            if not self.has_event(event, self.node):
-                event.apply(self.entry_set)
+            if not self.has_event(event, self.id):
+                res = event.apply(self.entry_set)
+                if res:
+                    self.events.append(event)
 
+        self.table.sync(new_table)
 
     def send(self, _id):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -65,7 +68,7 @@ class Node():
             # Receive data from the server and shut down
             received = sock.recv(1024)
             # Add To EntrySet
-        except : 
+        except:
             pass
             # Node Down cancel conflict
         finally:
