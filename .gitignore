@@ -1,5 +1,7 @@
 # Created by https://www.gitignore.io/api/linux,python,vim
 
+log.dat
+
 ### Linux ###
 *~
 
