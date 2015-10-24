@@ -2,6 +2,8 @@ import SocketServer
 from threading import Thread
 from sys import argv
 import socket
+import calendar
+import os
 node = None
 
 class MyTCPHandler(SocketServer.BaseRequestHandler):
@@ -19,6 +21,11 @@ class Node():
         listener = SocketServer.TCPServer((self.ip, 6000), MyTCPHandler)
         self.thread = Thread(target = listener.serve_forever)
         self.thread.start()
+        dic = calendar.EntrySet()
+        if (os.path.isfile("log.dat")):
+            dic.create_from_log()
+        file = open('log.dat', 'a')
+
 
     def init_calendar(self):
         self.table = TimeTable(1)
@@ -63,5 +70,3 @@ class Node():
 
 if __name__ == "__main__":
     node = Node(argv[1])
-    dic = EntrySet()
-
