@@ -29,8 +29,10 @@ class Node():
         self.thread = Thread(target = self.listener.serve_forever)
         self.thread.start()
         self.entry_set = calendar.EntrySet()
+
         if os.path.isfile("log.dat"):
             self.entry_set.create_from_log()
+        self.log = open("log.txt", "a")
 
         self.init_calendar()
 
@@ -63,12 +65,17 @@ class Node():
                     res = event.apply(self.entry_set)
                     if res:
                         self.events.append(event)
+                        data = {
+                            'events': [event.to_JSON()],
+                        }
+                        log.write(json.dumps(data))
                     elif event.type == MessageTypes.Insert:
                         send_failure(event)
 
             self.table.sync(new_table)
 
-    def send(self, _id):
+
+    def send(self, _id, event=None):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             data = "data"
@@ -81,8 +88,13 @@ class Node():
             received = sock.recv(1024)
             # Add To EntrySet
         except:
-            pass
             # Node Down cancel conflict
+            if not event == None:
+                event.type = MessageTypes.Delete
+                event = event.apply(self.entry_set)
+                self.events.append(event)
+            pass
+
         finally:
             sock.close()
 
@@ -131,7 +143,6 @@ def main():
     Node.ips = open('ip', 'r').read().split("\n")[0:4]
     node = Node(argv[1])
     if (len(argv) == 2):
-
         while True:
             print "[v] View Appointments"
             print "[a] Add Appointment"
