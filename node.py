@@ -4,6 +4,8 @@ from sys import argv
 from calendar import *
 from time_table import *
 import socket
+import calendar
+import os
 node = None
 
 class MyTCPHandler(SocketServer.BaseRequestHandler):
@@ -22,6 +24,11 @@ class Node():
         listener = SocketServer.TCPServer((self.ip, 6000), MyTCPHandler)
         self.thread = Thread(target = listener.serve_forever)
         self.thread.start()
+        dic = calendar.EntrySet()
+        if (os.path.isfile("log.dat")):
+            dic.create_from_log()
+        file = open('log.dat', 'a')
+
 
     def init_calendar(self):
         self.table = TimeTable(1)
@@ -60,7 +67,13 @@ class Node():
             if not self.has_event(event, node_id)
                 partial.append(event)
 
+        data = {
+            'table': self.table,
+            'events': partial,
+        }
+
+        self.send(json.dumps(data))
+
 if __name__ == "__main__":
     Node.ips = open('ip', 'r').read().split("\n")[0:4]
     node = Node(argv[1])
-
