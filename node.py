@@ -24,9 +24,9 @@ class Node():
         listener = SocketServer.TCPServer((self.ip, 6000), MyTCPHandler)
         self.thread = Thread(target = listener.serve_forever)
         self.thread.start()
-        dic = calendar.EntrySet()
-        if (os.path.isfile("log.dat")):
-            dic.create_from_log()
+        self.entry_set = calendar.EntrySet()
+        if os.path.isfile("log.dat"):
+            self.entry_set.create_from_log()
 
 
 
@@ -54,8 +54,6 @@ class Node():
                         self.events.append(event)
                     elif event.type == MessageTypes.Insert:
                         send_failure(event)
-
-
             self.table.sync(new_table)
 
     def send(self, _id):
@@ -97,10 +95,10 @@ class Node():
         partial = []
         for event in self.events:
             if not self.has_event(event, node_id):
-                partial.append(event)
+                partial.append(event.to_JSON())
 
         data = {
-            'table': self.table,
+            'table': self.table.to_JSON(),
             'events': partial,
         }
 
