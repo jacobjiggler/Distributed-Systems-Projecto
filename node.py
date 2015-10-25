@@ -1,6 +1,7 @@
 import SocketServer
 from threading import Thread
 from sys import argv
+import sys
 from calendar import *
 from time_table import *
 import socket
@@ -14,10 +15,11 @@ node = None
 
 class MyTCPHandler(SocketServer.BaseRequestHandler):
     def handle(self):
-        print "I got some information"
+        print "got some information"
         # self.request is the TCP socket connected to the client
         self.data = self.request.recv(1024).strip()
         if node:
+            print "test"
             node.receive(self.data)
 
 class Node():
@@ -47,6 +49,7 @@ class Node():
     # Expect data in the form:
     # {'table': <serialized table>, 'events': <array of events>}
     def receive(self, raw):
+        print "I received some dicks n stuff"
         # unserialize the data, somehow
         data = json.loads(raw)
         if data['type'] == "failure":
@@ -142,6 +145,8 @@ class Node():
 
         for id in entry.participants:
             self.send_to_node(id)
+    def kill_thread(self):
+        self.thread.terminate()
 
 def main():
     Node.ips = open('ip', 'r').read().split("\n")[0:4]
@@ -152,6 +157,7 @@ def main():
             print "[v] View Appointments"
             print "[a] Add Appointment"
             print "[d] Delete Appointment"
+            print "[q] Quit Application"
 
             resp = raw_input("Choice: ").lower()
             if resp == 'v':
@@ -178,6 +184,9 @@ def main():
                 for id in entry.participants:
                     if not id == node_id:
                         node.send(id, json.dumps(data))
+            elif resp == 'q':
+                #node.kill_thread()
+                sys.exit(0)
 
 if __name__ == "__main__":
     main()
