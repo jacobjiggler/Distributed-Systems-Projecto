@@ -175,7 +175,7 @@ def main():
                 event.apply(node.entry_set, node) 
                 for id in entry.participants:
                     if not id == node_id:
-                    node.send(id, json.dumps(data))
+                        node.send(id, json.dumps(data))
 
 if __name__ == "__main__":
     main()

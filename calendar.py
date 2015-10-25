@@ -3,7 +3,6 @@ import datetime
 import json
 
 class Entry():
-    log = None
     def __init__(self, participants=None, name = None, day=None, start=None):
         self.participants = participants
         self.name = name
@@ -13,7 +12,7 @@ class Entry():
     def __repr__(self):
         return "Participants: %s, Name: %s, Day: %s, Time: %s" % (self.participants, self.name, self.day, self.start)
     def __eq__(self, other):
-        if isinstance(other, Item):
+        if isinstance(other, Entry):
             return ((self.participants == other.participants) and (self.name == other.name) and (self.day == other.day) and (self.start == other.start))
         else:
             return False
@@ -37,7 +36,6 @@ class Entry():
 
 
 class EntrySet():
-    log = None
     def __init__(self):
         self.calendar = []
         
@@ -66,7 +64,7 @@ class EntrySet():
             return True
 
     def delete(self, entry):
-        if self.calendar.find(entry):
+        if entry in self.calendar:
             self.calendar.remove(entry)
             return True
         else:
