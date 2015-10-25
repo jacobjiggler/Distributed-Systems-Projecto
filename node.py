@@ -18,9 +18,9 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         print "got some information"
         # self.request is the TCP socket connected to the client
         self.data = self.request.recv(1024).strip()
-        if node:
+        if self.node:
             print "test"
-            node.receive(self.data)
+            self.node.receive(self.data)
 
 class Node():
     ips = []
@@ -28,6 +28,7 @@ class Node():
         self.id = int(_id)
         self.ip = Node.ips[self.id]
         self.listener = SocketServer.TCPServer(('0.0.0.0', 6000), MyTCPHandler)
+        self.listener.node = self
         self.thread = Thread(target = self.listener.serve_forever)
         self.thread.start()
         self.entry_set = calendar.EntrySet()
