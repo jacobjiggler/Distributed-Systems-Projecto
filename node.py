@@ -164,7 +164,7 @@ def main():
 
             elif resp == 'd':
                 resp = int(raw_input("Enter Appointment number: "))
-                entry = node.entries[resp]
+                entry = node.entry_set[resp]
                 event = Event(MessageType.Delete, time.time(), node, entry)
                 data = {
                     'table': node.table.to_JSON(),
