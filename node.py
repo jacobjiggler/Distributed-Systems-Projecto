@@ -14,6 +14,7 @@ node = None
 
 class MyTCPHandler(SocketServer.BaseRequestHandler):
     def handle(self):
+        print "I got some information"
         # self.request is the TCP socket connected to the client
         self.data = self.request.recv(1024).strip()
         if node:
@@ -86,6 +87,7 @@ class Node():
             received = sock.recv(1024)
             # Add To EntrySet
         except:
+            print "asdfsdf"
             # Node Down cancel conflict
             if not event == None:
                 d = json.loads(event)
