@@ -11,7 +11,7 @@ class Entry():
         self.start = start
 
     def __repr__(self):
-        return "Entry(%s, %s, %s, %s)" % (self.participants, self.name, self.day, self.start)
+        return "Participants: %s, Name: %s, Day: %s, Time: %s" % (self.participants, self.name, self.day, self.start)
     def __eq__(self, other):
         if isinstance(other, Item):
             return ((self.participants == other.participants) and (self.name == other.name) and (self.day == other.day) and (self.start == other.start))
@@ -43,6 +43,8 @@ class EntrySet():
         
     def __repr__(self):
         strs = map(str, self.calendar)
+        for i in xrange(0, len(strs)):
+            strs[i] = "[" + str(i) + "] " + strs[i]
         return '\n'.join(strs)
 
     def __getitem__(self, key):

@@ -154,15 +154,15 @@ def main():
 
             resp = raw_input("Choice: ").lower()
             if resp == 'v':
-                print(node.entry_set.__repr__())
+                print node.entry_set.__repr__()
 
             elif resp == 'a':
                 part = map(int, raw_input("Node Ids of participants (comma seperated): ").split(","))
                 nam = raw_input("Event name: ")
                 day = raw_input("Day: ")
-                time = raw_input("Time: ")
+                _time = raw_input("Time: ")
 
-                entry = Entry(part, nam, day, time)
+                entry = Entry(part, nam, day, _time)
                 node.add_entry(entry)
 
             elif resp == 'd':
