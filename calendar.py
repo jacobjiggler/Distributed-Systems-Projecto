@@ -2,8 +2,6 @@ import time
 import datetime
 import json
 
-from event import Event
-
 class Entry():
     log = None
     def __init__(self, participants=None, name = None, day=None, start=None):
@@ -13,9 +11,9 @@ class Entry():
         self.start = start
 
     def __repr__(self):
-        return "Name: %s\nParticipants: %s\nDay: %s\nTime: %s)" % (self.name, self.participants, self.day, self.start)
+        return "Entry(%s, %s, %s, %s)" % (self.participants, self.name, self.day, self.start)
     def __eq__(self, other):
-        if isinstance(other, Entry):
+        if isinstance(other, Item):
             return ((self.participants == other.participants) and (self.name == other.name) and (self.day == other.day) and (self.start == other.start))
         else:
             return False
@@ -43,13 +41,14 @@ class EntrySet():
     def __init__(self):
         self.calendar = []
 
-    def __repr__(self):
-        strs = map(str, self.calendar)
-        return '\n'.join(strs)
+    def __getitem__(self, key):
+        return self.calendar[key]
+
 
     #log file exists with entries
     def create_from_log(self):
         self.calendar = []
+
         #create calendar from it
         #using log file
 
@@ -61,7 +60,7 @@ class EntrySet():
             return True
 
     def delete(self, entry):
-        if entry in self.calendar:
+        if self.calendar.find(entry):
             self.calendar.remove(entry)
             return True
         else:
