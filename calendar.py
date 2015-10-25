@@ -3,7 +3,7 @@ import datetime
 import json
 
 class Entry():
-
+    log = None
     def __init__(self, participants=None, name = None, day=None, start=None):
         self.participants = participants
         self.name = name
@@ -37,6 +37,7 @@ class Entry():
 
 
 class EntrySet():
+    log = None
     def __init__(self):
         self.calendar = []
 

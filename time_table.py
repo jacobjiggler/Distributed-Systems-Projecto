@@ -2,6 +2,7 @@ import json
 
 # A class to represent the time table's held by each node
 class TimeTable(object):
+    log = None
     def __init__(self, dim=None):
         self.dim = dim
         self.init_table()
