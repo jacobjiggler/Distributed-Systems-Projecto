@@ -14,7 +14,6 @@ node = None
 
 class MyTCPHandler(SocketServer.BaseRequestHandler):
     def handle(self):
-        print "dicks"
         # self.request is the TCP socket connected to the client
         self.data = self.request.recv(1024).strip()
         if node:
@@ -25,7 +24,6 @@ class Node():
     def __init__(self, _id):
         self.id = int(_id)
         self.ip = Node.ips[self.id]
-
         self.listener = SocketServer.TCPServer(('0.0.0.0', 6000), MyTCPHandler)
         self.thread = Thread(target = self.listener.serve_forever)
         self.thread.start()
@@ -33,12 +31,8 @@ class Node():
 
         if os.path.isfile("log.dat"):
             self.entry_set.create_from_log()
-        self.log = open("log.txt", "a")
-        TimeTable.log = self.log
-        Event.log = self.log
-        Entry.log = self.log
-        EntrySet.log = self.log
-
+        self.log = open("log.dat", "a+")
+        
         self.init_calendar()
 
     def init_calendar(self):
@@ -67,7 +61,7 @@ class Node():
             # For all events this node doesn't have, make modifications
             for event in new_events:
                 if not self.has_event(event, self.id):
-                    res = event.apply(self.entry_set)
+                    res = event.apply(self.entry_set, self)
                     if res:
                         self.events.append(event)
                         data = {
@@ -83,21 +77,22 @@ class Node():
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             data = "data"
-            print("Sending Data from client")
+           # print("Sending Data from client")
             # Connect to server and send data
             sock.connect((Node.ips[_id], 6000))
-            sock.sendall(data + "\n")
+            sock.sendall(event)
 
             # Receive data from the server and shut down
             received = sock.recv(1024)
             # Add To EntrySet
         except:
-            print ("Node " + _id + " appears to be down")
             # Node Down cancel conflict
             if not event == None:
-                print "asdf"
+                d = json.loads(event)
+                dd = json.loads(d['events'][0])
+                event = Event.load(dd)
                 event.type = MessageTypes.Delete
-                event = event.apply(self.entry_set)
+                event = event.apply(self.entry_set, self)
                 self.events.append(event)
             pass
 
@@ -140,7 +135,7 @@ class Node():
 
     def add_entry(self, entry):
         event = Event(MessageTypes.Insert, time.time(), self.id, entry)
-        event.apply(self.entry_set)
+        event.apply(self.entry_set, self)
         self.events.append(event)
 
         for id in entry.participants:
@@ -148,7 +143,8 @@ class Node():
 
 def main():
     Node.ips = open('ip', 'r').read().split("\n")[0:4]
-    node = Node(argv[1])
+    node_id = int(argv[1])
+    node = Node(node_id)
     if (len(argv) == 2):
         while True:
             print "[v] View Appointments"
@@ -176,8 +172,10 @@ def main():
                     'table': node.table.to_JSON(),
                     'events': [event.to_JSON()],
                 }
-
-                node.send(json.dumps(data))
+                event.apply(node.entry_set, node) 
+                for id in entry.participants:
+                    if not id == node_id:
+                    node.send(id, json.dumps(data))
 
 if __name__ == "__main__":
     main()
