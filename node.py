@@ -14,6 +14,7 @@ node = None
 
 class MyTCPHandler(SocketServer.BaseRequestHandler):
     def handle(self):
+        print "dicks"
         # self.request is the TCP socket connected to the client
         self.data = self.request.recv(1024).strip()
         if node:
@@ -91,6 +92,7 @@ class Node():
             received = sock.recv(1024)
             # Add To EntrySet
         except:
+            print ("Node " + _id + " appears to be down")
             # Node Down cancel conflict
             if not event == None:
                 event.type = MessageTypes.Delete
