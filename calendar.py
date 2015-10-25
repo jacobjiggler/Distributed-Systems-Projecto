@@ -43,6 +43,7 @@ class EntrySet():
     def __getitem__(self, key):
         return self.calendar[key]
 
+
     #log file exists with entries
     def create_from_log(self):
         self.calendar = []
@@ -52,17 +53,17 @@ class EntrySet():
 
     def add(self, entry):
         if entry in self.calendar:
-            return false
+            return False
         else:
             self.calendar.append(entry)
-            return true
+            return True
 
     def delete(self, entry):
         if self.calendar.find(entry):
             self.calendar.remove(entry)
-            return true
+            return True
         else:
-            return false
+            return False
 
     def to_JSON(self):
         return json.dumps(self, default=lambda o: o.__dict__,
