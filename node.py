@@ -95,6 +95,7 @@ class Node():
             print ("Node " + _id + " appears to be down")
             # Node Down cancel conflict
             if not event == None:
+                print "asdf"
                 event.type = MessageTypes.Delete
                 event = event.apply(self.entry_set)
                 self.events.append(event)
@@ -135,7 +136,7 @@ class Node():
             'events': partial,
         }
 
-        self.send(json.dumps(data))
+        self.send(node_id, json.dumps(data))
 
     def add_entry(self, entry):
         event = Event(MessageTypes.Insert, time.time(), self.id, entry)
