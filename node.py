@@ -32,7 +32,7 @@ class Node():
         if os.path.isfile("log.dat"):
             self.entry_set.create_from_log()
         self.log = open("log.dat", "a+")
-        
+
         self.init_calendar()
 
     def init_calendar(self):
@@ -172,10 +172,10 @@ def main():
                     'table': node.table.to_JSON(),
                     'events': [event.to_JSON()],
                 }
-                event.apply(node.entry_set, node) 
+                event.apply(node.entry_set, node)
                 for id in entry.participants:
                     if not id == node_id:
-                    node.send(id, json.dumps(data))
+                        node.send(id, json.dumps(data))
 
 if __name__ == "__main__":
     main()
