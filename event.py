@@ -22,8 +22,8 @@ class Event:
         return a
 
     def apply(self, entry_set):
-        if log:
-            log.write(self.to_JSON() + "\n")
+        if Event.log:
+            Event.log.write(self.to_JSON() + "\n")
             print self.to_JSON()
         if self.type == MessageTypes.Insert:
             return entry_set.add(self.entry)
