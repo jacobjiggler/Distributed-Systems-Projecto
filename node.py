@@ -57,6 +57,7 @@ class Node():
         # unserialize the data, somehow
         data = json.loads(raw)
         print(data)
+        print(data['node_id'])
         if data['type'] == "failure":
             rec_failure(data)
         else:
@@ -76,14 +77,13 @@ class Node():
                     res = event.apply(self.entry_set, self)
                     if res:
                         self.events.append(event)
-                        data = {
-                            'events': [event.to_JSON()],
-                        }
-                    elif event.type == MessageTypes.Insert:
-                        send_failure(event)
+                    else:
+                        if event.type == MessageTypes.Insert:
+                            self.send_failure(event)
 
-            self.table.sync(new_table)
+            self.table.sync(new_table, self.id, data['node_id'])
 
+            print(self.table.table)
 
     def send(self, _id, event=None):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -118,6 +118,7 @@ class Node():
 
         print("Sending Failure command")
         data = {
+            'node_id': self.id,
             'type': 'failure',
             'event': event.to_JSON()
         }
@@ -144,6 +145,7 @@ class Node():
 
         data = {
             'type': 'sync',
+            'node_id': self.id,
             'table': self.table.to_JSON(),
             'events': partial,
         }
@@ -152,6 +154,7 @@ class Node():
 
     def add_entry(self, entry):
         event = Event(MessageTypes.Insert, time.time(), self.id, entry)
+        self.table.update(self.id, time.time() + 1)
         event.apply(self.entry_set, self)
         self.events.append(event)
 
@@ -181,7 +184,7 @@ def main():
                 nam = raw_input("Event name: ")
                 day = raw_input("Day: ")
                 _startTime = raw_input("Start Time: ")
-		_endTime = raw_input("End Time: ")
+                _endTime = raw_input("End Time: ")
 
                 entry = Entry(part, nam, day, _startTime, _endTime)
                 node.add_entry(entry)
@@ -192,7 +195,7 @@ def main():
                 event = Event(MessageTypes.Delete, time.time(), node, entry)
                 data = {
                     'table': node.table.to_JSON(),
-                    'events': [event.to_JSON()],
+                    'events': [event.to_JSON],
                 }
                 event.apply(node.entry_set, node)
                 for id in entry.participants:

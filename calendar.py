@@ -55,6 +55,9 @@ class EntrySet():
 
     def add(self, entry):
         if entry in self.calendar:
+            print(entry)
+            print(self.calendar)
+            print("lel this is wrong")
             return False
         else:
             self.calendar.append(entry)
