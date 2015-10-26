@@ -99,11 +99,12 @@ class Node():
         except:
             # Node Down cancel conflict
             if not event == None:
+                print("Failed to connect to node: " + str(_id))
                 d = json.loads(event)
                 dd = json.loads(d['events'][0])
                 event = Event.load(dd)
                 event.entry = Entry.load(event.entry)
-                self.delete_entry(event.entry)
+                self.delete_entry(event.entry, [_id])
             pass
 
         finally:
@@ -162,7 +163,7 @@ class Node():
             if not id == self.id:
                 self.send_to_node(id)
 
-    def delete_entry(self, entry):
+    def delete_entry(self, entry, exclude=[]):
         event = Event(MessageTypes.Delete, time.time(), self.id, entry)
         self.table.update(self.id, time.time() + 0.1)
         event.apply(self.entry_set, self)
@@ -170,7 +171,8 @@ class Node():
 
         for id in entry.participants:
             if not id == self.id:
-                self.send_to_node(id)
+                if not id in exclude:
+                    self.send_to_node(id)
 
     def kill_thread(self):
         self.thread.terminate()
