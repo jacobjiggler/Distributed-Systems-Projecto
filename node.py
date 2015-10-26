@@ -168,9 +168,10 @@ def main():
                 part = map(int, raw_input("Node Ids of participants (comma seperated): ").split(","))
                 nam = raw_input("Event name: ")
                 day = raw_input("Day: ")
-                _time = raw_input("Time: ")
+                _startTime = raw_input("Start Time: ")
+		_endTime = raw_input("End Time: ")
 
-                entry = Entry(part, nam, day, _time)
+                entry = Entry(part, nam, day, _startTime, _endTime)
                 node.add_entry(entry)
 
             elif resp == 'd':
