@@ -57,7 +57,7 @@ class Node():
         print(self.table.table)
         print(data)
         if data['type'] == "failure":
-            rec_failure(data)
+            self.rec_failure(data)
         else:
             new_table = TimeTable.load(json.loads(data['table']), len(Node.ips))
             events = data['events']
@@ -121,10 +121,10 @@ class Node():
             'type': 'failure',
             'event': event.to_JSON()
         }
-        json.dumps(data)
+
+        self.send(event.node, json.dumps(data))
 
     def rec_failure(self, data):
-        data = json.loads(data)
         event = Event.load(json.loads(data['event']))
         event.entry = Entry.load(event.entry)
 
