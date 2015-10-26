@@ -14,7 +14,7 @@ class Entry():
         return "Participants: %s, Name: %s, Day: %s, Time: %s - %s" % (self.participants, self.name, self.day, self.start, self.end)
     def __eq__(self, other):
         if isinstance(other, Entry):
-            return ((self.participants == other.participants) and (self.name == other.name) and (self.day == other.day) and (self.start == other.start) and (self.end == other.end)
+            return ((self.participants == other.participants) and (self.name == other.name) and (self.day == other.day) and (self.start == other.start) and (self.end == other.end))
         else:
             return False
     def __ne__(self, other):
