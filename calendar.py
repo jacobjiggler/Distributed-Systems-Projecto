@@ -3,17 +3,18 @@ import datetime
 import json
 
 class Entry():
-    def __init__(self, participants=None, name = None, day=None, start=None):
+    def __init__(self, participants=None, name = None, day=None, start=None, end=None):
         self.participants = participants
         self.name = name
         self.day = day
         self.start = start
+	self.end = end
 
     def __repr__(self):
-        return "Participants: %s, Name: %s, Day: %s, Time: %s" % (self.participants, self.name, self.day, self.start)
+        return "Participants: %s, Name: %s, Day: %s, Time: %s - %s" % (self.participants, self.name, self.day, self.start, self.end)
     def __eq__(self, other):
         if isinstance(other, Entry):
-            return ((self.participants == other.participants) and (self.name == other.name) and (self.day == other.day) and (self.start == other.start))
+            return ((self.participants == other.participants) and (self.name == other.name) and (self.day == other.day) and (self.start == other.start) and (self.end = other.end)
         else:
             return False
     def __ne__(self, other):
