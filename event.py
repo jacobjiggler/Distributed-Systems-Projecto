@@ -32,9 +32,10 @@ class Event:
         return a
 
     def apply(self, entry_set, node):
-        if node.log:
+        if node.log and not node.log.closed and not self == node.last:
             node.log.write(self.to_JSON() + "\n")
             node.log.flush()
+        node.last = self
         if self.type == MessageTypes.Insert:
             return entry_set.add(self.entry)
         elif self.type == MessageTypes.Delete:
