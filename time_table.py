@@ -13,8 +13,11 @@ class TimeTable(object):
 
     # When syncing with a new node, just update all of our clock times to
     # the max of both tables
-    def sync(self, t2):
+    def sync(self, t2, self_id, sync_id):
         assert len(t2.table) == len(self.table)
+
+        for i in range(self.dim):
+            self.table[self_id][i] = t2.table[sync_id][i]
 
         for i in range(self.dim):
             for j in range(self.dim):
