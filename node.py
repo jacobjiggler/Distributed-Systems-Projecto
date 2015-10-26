@@ -97,17 +97,13 @@ class Node():
             received = sock.recv(1024)
             # Add To EntrySet
         except:
-            print "asdfsdf"
             # Node Down cancel conflict
             if not event == None:
                 d = json.loads(event)
                 dd = json.loads(d['events'][0])
                 event = Event.load(dd)
                 event.entry = Entry.load(event.entry)
-                print event.entry
-                event.type = MessageTypes.Delete
-                test = event.apply(self.entry_set, self)
-                self.events.append(event)
+                self.delete_entry(event.entry)
             pass
 
         finally:
