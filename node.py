@@ -105,8 +105,10 @@ class Node():
                 d = json.loads(event)
                 dd = json.loads(d['events'][0])
                 event = Event.load(dd)
+                event.entry = Entry.load(event.entry)
+                print event.entry
                 event.type = MessageTypes.Delete
-                event = event.apply(self.entry_set, self)
+                test = event.apply(self.entry_set, self)
                 self.events.append(event)
             pass
 
