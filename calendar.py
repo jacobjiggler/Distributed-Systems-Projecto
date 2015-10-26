@@ -8,7 +8,7 @@ class Entry():
         self.name = name
         self.day = day
         self.start = start
-	self.end = end
+        self.end = end
 
     def __repr__(self):
         return "Participants: %s, Name: %s, Day: %s, Time: %s - %s" % (self.participants, self.name, self.day, self.start, self.end)
@@ -25,6 +25,25 @@ class Entry():
     def to_JSON(self):
         return json.dumps(self, default=lambda o: o.__dict__,
             sort_keys=True)
+
+    def is_valid(self, entry):
+        if self.day != entry.day:
+            return True
+        else:
+            caltime1 = self.start.split(':')
+            caltime2 = self.end.split(':')
+            entime1 = entry.start.split(':')
+            entime2 = entry.end.split(':')
+            c1 = int(caltime1[0])*60 + int(caltime1[1])
+            c2 = int(caltime2[0])*60 + int(caltime2[1])
+            e1 = int(entime1[0])*60 + int(entime1[1]) + 1
+            e2 = int(entime2[0])*60 + int(entime2[1]) - 1
+            if e1 > c1 and e1 < c2:
+                return False
+            if e2 > c1 and e2 < c2:
+                return False
+            else:
+                return True
 
     @staticmethod
     def load(js):
@@ -54,10 +73,12 @@ class EntrySet():
         #using log file
 
     def add(self, entry):
-        if entry in self.calendar:
-            print(entry)
-            print(self.calendar)
-            print("lel this is wrong")
+        valid = True
+        for existing_entry in self.calendar:
+            if not entry.is_valid(existing_entry):
+                valid = False
+                print "scheduling conflict"
+        if entry in self.calendar or not valid:
             return False
         else:
             self.calendar.append(entry)
