@@ -1,6 +1,8 @@
 import time
 import datetime
 import json
+import sys
+import os
 
 class Entry():
     def __init__(self, participants=None, name = None, day=None, start=None, end=None):
@@ -50,6 +52,7 @@ class Entry():
         a = Entry()
         a.__dict__ = js
         return a
+from event import Event
 
 class EntrySet():
     def __init__(self):
@@ -64,13 +67,29 @@ class EntrySet():
     def __getitem__(self, key):
         return self.calendar[key]
 
-
     #log file exists with entries
-    def create_from_log(self):
-        self.calendar = []
-
+    def create_from_log(self, node):
+        node.log.close()
+        log =  open('log.dat','r')
+        for l in log:
+            event = json.loads(l)
+            event = Event.load(event)
+            event.entry = Entry.load(event.entry)
+            event.apply(node.entry_set, node)
+            node.events.append(event)
+            for i in event.entry.participants:
+                if event.time > node.table.table[node.id][i]:
+                    node.table.table[node.id][i] = event.time
+        
+                
+        log.close()
+        
+        
         #create calendar from it
         #using log file
+        
+        
+        node.log = open("log.dat", "a+")
 
     def add(self, entry):
         valid = True
