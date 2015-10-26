@@ -11,6 +11,8 @@ class Event:
         self.entry = entry
     
     def dicttester(self, o):
+        if hasattr(o, 'thread'):
+            return o.id
         if hasattr(o, '__dict__'):
             return o.__dict__
         else:
