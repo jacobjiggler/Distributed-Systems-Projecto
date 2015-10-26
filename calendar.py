@@ -3,11 +3,12 @@ import datetime
 import json
 
 class Entry():
-    def __init__(self, participants=None, name = None, day=None, start=None):
+    def __init__(self, participants=None, name = None, day=None, start=None, end=None):
         self.participants = participants
         self.name = name
         self.day = day
         self.start = start
+	self.end = end
 
     def __repr__(self):
         return "Participants: %s, Name: %s, Day: %s, Time: %s" % (self.participants, self.name, self.day, self.start)
