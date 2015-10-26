@@ -53,11 +53,9 @@ class Node():
     # Expect data in the form:
     # {'table': <serialized table>, 'events': <array of events>}
     def receive(self, raw):
-        print "I received some dicks n stuff"
-        # unserialize the data, somehow
         data = json.loads(raw)
+        print(self.table.table)
         print(data)
-        print(data['node_id'])
         if data['type'] == "failure":
             rec_failure(data)
         else:
@@ -82,8 +80,7 @@ class Node():
                             self.send_failure(event)
 
             self.table.sync(new_table, self.id, data['node_id'])
-
-            print(self.table.table)
+        print(self.table.table)
 
     def send(self, _id, event=None):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -125,9 +122,13 @@ class Node():
             'event': event.to_JSON()
         }
         json.dumps(data)
+
     def rec_failure(self, data):
         data = json.loads(data)
         event = Event.load(json.loads(data['event']))
+        event.entry = Entry.load(event.entry)
+
+        self.delete_entry(event.entry)
 
     # Check if a node has a certain event
     def has_event(self,event, node_id):
@@ -156,12 +157,24 @@ class Node():
 
     def add_entry(self, entry):
         event = Event(MessageTypes.Insert, time.time(), self.id, entry)
-        self.table.update(self.id, time.time() + 1)
+        self.table.update(self.id, time.time() + 0.1)
         event.apply(self.entry_set, self)
         self.events.append(event)
 
         for id in entry.participants:
-            self.send_to_node(id)
+            if not id == self.id:
+                self.send_to_node(id)
+
+    def delete_entry(self, entry):
+        event = Event(MessageTypes.Delete, time.time(), self.id, entry)
+        self.table.update(self.id, time.time() + 0.1)
+        event.apply(self.entry_set, self)
+        self.events.append(event)
+
+        for id in entry.participants:
+            if not id == self.id:
+                self.send_to_node(id)
+
     def kill_thread(self):
         self.thread.terminate()
 
@@ -194,15 +207,7 @@ def main():
             elif resp == 'd':
                 resp = int(raw_input("Enter Appointment number: "))
                 entry = node.entry_set[resp]
-                event = Event(MessageTypes.Delete, time.time(), node, entry)
-                data = {
-                    'table': node.table.to_JSON(),
-                    'events': [event.to_JSON],
-                }
-                event.apply(node.entry_set, node)
-                for id in entry.participants:
-                    if not id == node_id:
-                        node.send(id, json.dumps(data))
+                node.delete_entry(entry)
             elif resp == 'q':
                 #node.kill_thread()
                 sys.exit(0)
