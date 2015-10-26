@@ -32,14 +32,10 @@ class Entry():
         a.__dict__ = js
         return a
 
-
-
-
-
 class EntrySet():
     def __init__(self):
         self.calendar = []
-        
+
     def __repr__(self):
         strs = map(str, self.calendar)
         for i in xrange(0, len(strs)):

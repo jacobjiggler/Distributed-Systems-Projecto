@@ -23,9 +23,6 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         if node:
             node.receive(self.data)
         node.lock.release()
-        # self.request is the TCP socket connected to the client
-        if self.node:
-            self.node.receive(self.data)
 
 class Node():
     ips = []
@@ -38,7 +35,6 @@ class Node():
         self.thread = Thread(target = self.listener.serve_forever)
         self.thread.start()
         self.entry_set = calendar.EntrySet()
-        
 
         if os.path.isfile("log.dat"):
             self.entry_set.create_from_log()
@@ -60,15 +56,19 @@ class Node():
         print "I received some dicks n stuff"
         # unserialize the data, somehow
         data = json.loads(raw)
+        print(data)
         if data['type'] == "failure":
             rec_failure(data)
         else:
-            new_table = TimeTable.load(json.loads(data['table']))
+            new_table = TimeTable.load(json.loads(data['table']), len(Node.ips))
             events = data['events']
 
             new_events =[]
             for event in events:
-                new_events.append( Event.load(json.loads(event) ))
+                event = Event.load(json.loads(event))
+                if event.entry:
+                    event.entry = Entry.load(event.entry)
+                new_events.append(event)
 
             # For all events this node doesn't have, make modifications
             for event in new_events:
@@ -143,6 +143,7 @@ class Node():
                 partial.append(event.to_JSON())
 
         data = {
+            'type': 'sync',
             'table': self.table.to_JSON(),
             'events': partial,
         }
@@ -160,6 +161,7 @@ class Node():
         self.thread.terminate()
 
 def main():
+    global node
     Node.ips = open('ip', 'r').read().split("\n")[0:4]
     node_id = int(argv[1])
     node = Node(node_id)
