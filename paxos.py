@@ -1,4 +1,4 @@
-from threading import Thread, Lock
+from threading import Thread, Lock, Timer
 import Queue
 import SocketServer
 from calendar import EntrySet
@@ -42,16 +42,17 @@ class Agent():
     birthdays = []
     last_heartbeat = []
     votes = []
+    def check_heartbeat(self):
+        if (time.time() - self.last_heartbeat[self.leader]) >= 5:
+            self.elect_leader()
+
     heartbeat_checker = Timer(10, check_heartbeat)
     listener = SocketServer.UDPServer(('0.0.0.0', 6001), AgentUDPHandler)
     election_listener = SocketServer.TCPServer(('0.0.0.0', 6099), ElectionTCPHandler)
     thread = Thread(target = listener.serve_forever)
-    thread_election = Thread(target = listener.election_listener)
+    thread_election = Thread(target = election_listener.serve_forever)
     selfnode = None
     
-    def check_heartbeat(self):
-        if (time.time() - self.last_heartbeat[self.leader]) >= 5:
-            self.elect_leader()
     
     def elect_leader(self):
         if (self.votes == []):
@@ -95,6 +96,8 @@ class Agent():
         
         if nVotes == len(self.votes) - 2:
             self.leader = mVotesId
+            if hasattr(self, 'acceptors'):
+                del self.acceptors[mVotesId]
             if (self.self.node.id == mVotesId):
                 self.become_leader()
     
@@ -111,7 +114,6 @@ class Proposer(Agent):
     activeNegiation = False
     activeValue = None
     acceptors = []
-    nodes = []
     n = 1
     leader = 0
     maxReceived = {}
@@ -121,22 +123,31 @@ class Proposer(Agent):
     birthday = 0
     last_heartbeat = []
     
-    def __init__(self,  selfnode, acceptors, nodes, calendar=None):
+    def __init__(self,  selfnode, acceptors, calendar=None):
+        global ips
         self.acceptors = acceptors
         self.selfnode = selfnode
-        self.nodes = nodes
-        self.votes = [0] * len(nodes)
-        self.n = self.selfnodes.id
+        self.votes = [0] * len(ips)
+        self.n = self.selfnode.id
         self.heartbeat_checker.start()
-        self.birthdays = [0] * len(self.nodes)
+        self.birthdays = [0] * len(ips)
         self.thread.start()
         self.thread_election.start()
         self.birthday = time.time()
+        self.ticker = Timer(5, self.tick)
+        
         if calendar:
             self.calendar = EntrySet.load(calendar)
     
+    def tick(self):
+        if (activeValue == None and len(self.values) > 0):
+            data = {'event':self.values[0], 'hash' : self.calendar.entry_set.hash, 'type' : 'event'}
+            self.receive(json.dumps(data))
+            
     
     def receive(self, data):
+        global ips
+
         data = json.loads(data)
         if data['type'] == 'event':
             if self.calendar.entry_set.hash != data['hash']:
@@ -145,7 +156,8 @@ class Proposer(Agent):
                     'calendar' : self.calendar.toJSON()
                 }
                 self.send(data['from'], json.dumps(sdata), 6000)
-            self.values.add(data['value'])
+            if (data['value'] not in self.values):
+                self.values.add(data['value'])
             if self.activeNegiation == True:
                 return
             self.activeValue = data['value']
@@ -157,7 +169,7 @@ class Proposer(Agent):
             
             for acceptor in self.acceptors:
                 self.send(acceptor, json.dumps(data), 6002)
-            n += len(self.nodes) + 1
+            n += len(ips) + 1
             
         elif data['type'] == 'promise':
             if data['responce'] == 'reject':
@@ -197,7 +209,7 @@ class Proposer(Agent):
                         reset()
                         
                     d = json.dumps({'type' : 'learn' ,'event': event.to_JSON()})
-                    for node in self.nodes:
+                    for node in ips:
                         self.send(node, d, 6000)
                         #will this work to self?
                     values.discard(self.activeValue)
@@ -234,9 +246,8 @@ class Acceptor(Agent):
     
     
     def __init__(self, selfnode):
-        self.listener.start()
-        self.election_listener.start()
-        self.birthdays = [0] * len(self.selfnode.nodes)
+        global ips
+        self.birthdays = [0] * len(ips)
         self.selfnode = selfnode
         self.heartbeat_checker.start()
 
@@ -292,6 +303,21 @@ class Acceptor(Agent):
         sock.sendto(message, (_id, port))
         
     def become_leader(self):
+        global ips 
+        
+        heartbeat_checker.stop()
+        listener.shutdown()
+        listener.server_close()
+        election_listener.shutdown()
+        election_listener.close()
+        acceptors = []
+        global agent
+        i = 0
+        for ip in ips:
+            if i != self.id:
+                acceptors.append(i)
+        p = Proposer(self.selfnode, acceptors, self.selfnode.entry_set)
+        agent = p
         
     
             

@@ -8,6 +8,7 @@ import socket
 import time
 import calendar
 import os
+from paxos import *
 from threading import Timer
 
 from event import Event, MessageTypes
@@ -141,9 +142,21 @@ class Node():
 
 def main():
     global node
+    global agent
     Node.ips = open('ip', 'r').read().split("\n")[0:4]
     node_id = int(argv[1])
     node = Node(node_id)
+    
+    if node == 0:
+        i = 0
+        acceptors = []
+        for ip in Node.ips:
+            if i != self.id:
+                acceptors.append(i)
+            i += 1
+        agent = Proposer(node, acceptors)
+    else:
+        agent = Acceptor(node)
     if (len(argv) == 2):
         while True:
             print "[v] View Appointments"
