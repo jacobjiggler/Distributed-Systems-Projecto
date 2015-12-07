@@ -3,6 +3,7 @@ import datetime
 import json
 import sys
 import os
+import hashlib
 
 class Entry():
     def __init__(self, participants=None, name = None, day=None, start=None, end=None):
@@ -57,6 +58,7 @@ from event import Event
 class EntrySet():
     def __init__(self):
         self.calendar = []
+        self.hash = None
 
     def __repr__(self):
         strs = map(str, self.calendar)
@@ -101,7 +103,20 @@ class EntrySet():
             return False
         else:
             self.calendar.append(entry)
+            self.timestamp = time.time()
+            h = hashlib.md5()
+            h.update(self.__repr__())
+            self.hash = h.digest()
             return True
+            
+    def check(self, entry):
+        for existing_entry in self.calendar:
+            if not entry.is_valid(existing_entry):
+                valid = False
+                print "scheduling conflict"
+        if entry in self.calendar or not valid:
+            return False
+        return True
 
     def delete(self, entry):
         if entry in self.calendar:
