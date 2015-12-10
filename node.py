@@ -90,7 +90,7 @@ class Node():
                 else:
                     event.entry = Entry.load(json.loads(event.entry))
             print 'learning' + str(event)
-            if self.id != event.entry.me and self.id not in event.entry.participants:
+            if self.id not in event.entry.participants:
                 return
             res = event.apply(self.entry_set, self)
             if res:
@@ -192,7 +192,8 @@ def main():
                 day = raw_input("Day: ")
                 _startTime = raw_input("Start Time: ")
                 _endTime = raw_input("End Time: ")
-
+                part.append(node.id)
+                part = list(set(part))
                 entry = Entry(part, nam, day, _startTime, _endTime)
                 node.add_entry(entry, False)
 
