@@ -5,6 +5,7 @@ from calendar import EntrySet
 import time
 import socket
 import json
+from event import perpetualTimer
 agent = None
 ips = open('ip', 'r').read().split("\n")[0:5]
 
@@ -139,13 +140,13 @@ class Proposer(Agent):
         self.votes = [0] * len(ips)
         self.n = self.selfnode.id
         self.last_heartbeat = [time.time()] * 5
-        self.heartbeat_checker = Timer(10, self.check_heartbeat)
+        self.heartbeat_checker = perpetualTimer(10, self.check_heartbeat)
         self.heartbeat_checker.start()
         self.birthdays = [time.time()] * len(ips)
         self.thread.start()
         self.thread_election.start()
         self.birthday = time.time()
-        self.ticker = Timer(5, self.tick)
+        self.ticker = perpetualTimer(5, self.tick)
         self.ticker.start()
         
         if calendar:
@@ -265,7 +266,7 @@ class Acceptor(Agent):
         self.birthdays = [0] * len(ips)
         self.selfnode = selfnode
         self.last_heartbeat = [0] * 5
-        self.heartbeat_checker = Timer(10, self.check_heartbeat)
+        self.heartbeat_checker = perpetualTimer(10, self.check_heartbeat)
         self.listener = SocketServer.UDPServer(('0.0.0.0', 6001), AgentUDPHandler)
         self.election_listener = SocketServer.TCPServer(('0.0.0.0', 6099), ElectionTCPHandler)
         self.thread = Thread(target = self.listener.serve_forever)

@@ -1,10 +1,29 @@
 import json
-
+from threading import Timer
 from calendar import Entry
 
 # Enum to represent the different types of messages
 class MessageTypes:
     Insert, Delete = range(2)
+
+
+class perpetualTimer():
+
+   def __init__(self,t,hFunction):
+      self.t=t
+      self.hFunction = hFunction
+      self.thread = Timer(self.t,self.handle_function)
+
+   def handle_function(self):
+      self.hFunction()
+      self.thread = Timer(self.t,self.handle_function)
+      self.thread.start()
+
+   def start(self):
+      self.thread.start()
+
+   def cancel(self):
+      self.thread.cancel()
 
 class Event:
     def __init__(self, typ=None, time=None, node=None, entry=None):

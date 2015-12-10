@@ -13,7 +13,7 @@ import json
 import paxos
 from threading import Timer
 
-from event import Event, MessageTypes
+from event import Event, MessageTypes, perpetualTimer
 
 node = None
 
@@ -42,7 +42,7 @@ class Node():
         self.thread = Thread(target = self.listener.serve_forever)
         self.thread.start()
         
-        self.heartbeat_timer = Timer(2, self.heartbeat)
+        self.heartbeat_timer = perpetualTimer(2, self.heartbeat)
         self.heartbeat_timer.start()
         
         
