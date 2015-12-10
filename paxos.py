@@ -248,7 +248,8 @@ class Proposer(Agent):
         global ips
         print 'learning data'
         event = Event.load(json.loads(self.activeValue))
-        event.entry = Entry.load(event.entry)
+        print event.entry
+        #event.entry = Entry.load(event.entry)
 
         if event.entry:
             event.entry = Entry.load(event.entry)
