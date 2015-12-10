@@ -96,7 +96,7 @@ class Node():
         data = {'event':event.to_JSON(), 'hash' : self.entry_set.hash, 'type' : 'event'}
         if (paxos.agent.leader == self.id):
             print 'sending to self'
-            paxos.agent.receive(data)
+            paxos.agent.receive(json.dumps(data))
             return
         
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
