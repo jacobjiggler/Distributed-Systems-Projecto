@@ -153,8 +153,6 @@ class Proposer(Agent):
         self.heartbeat_checker = perpetualTimer(8, self.check_heartbeat)
         self.heartbeat_checker.start()
         self.birthdays = [0] * len(ips)
-        self.thread.start()
-        self.thread_election.start()
         self.birthday = time.time()
         self.ticker = perpetualTimer(5, self.tick)
         self.ticker.start()
