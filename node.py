@@ -151,7 +151,7 @@ def main():
     node_id = int(argv[1])
     node = Node(node_id)
     
-    if node == 0:
+    if node_id == 0:
         i = 0
         acceptors = []
         for ip in Node.ips:
