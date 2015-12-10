@@ -33,10 +33,10 @@ class AgentUDPHandler(SocketServer.BaseRequestHandler):
             agent.lock.acquire()                    
             
         if 'nEvents' in data and agent.leader == agent.selfnode.id:
-            if data['nEvents'] < len(self.events):
+            if data['nEvents'] < len(agent.events):
                 sEvents = []
-                for i in range(data['nEvents'], len(self.events)):
-                    sEvents.append( self.events[i].to_JSON() )
+                for i in range(data['nEvents'], len(agent.events)):
+                    sEvents.append( agent.events[i].to_JSON() )
                     d = {
                         'type' : 'sync',
                         'events' : json.dumps(sEvents)
