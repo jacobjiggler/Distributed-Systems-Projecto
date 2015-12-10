@@ -80,7 +80,7 @@ class Node():
     # {'type' => type, 'calendar' => Entry_Set, 'value' => Entry }
     def receive(self, raw):
         data = json.loads(raw)
-        print "received: " + data
+        print "received: " + str(data)
         
         if data['type'] == "learn":
             event = Event.load(data['event'])
