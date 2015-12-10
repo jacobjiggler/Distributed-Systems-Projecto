@@ -196,7 +196,7 @@ class Proposer(Agent):
             
             for acceptor in self.acceptors:
                 self.send(acceptor, json.dumps(data), 6002)
-            n += len(ips) + 1
+            self.n += len(ips) + 1
             
         elif data['type'] == 'promise':
             if data['responce'] == 'reject':
