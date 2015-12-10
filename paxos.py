@@ -337,7 +337,7 @@ class Acceptor(Agent):
                 'from': self.selfnode.id,
                 'n': data['n']
             }
-            self.send(leader, json.dumps(sdata))
+            self.send(self.leader, json.dumps(sdata))
             
     def send(self, _id, message, port=6001):
         global ips
