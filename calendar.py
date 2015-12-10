@@ -84,9 +84,9 @@ class EntrySet():
             event.entry = Entry.load(event.entry)
             event.apply(node.entry_set, node)
             node.events.append(event)
-            for i in event.entry.participants:
-                if event.time > node.table.table[node.id][i]:
-                    node.table.table[node.id][i] = event.time
+            #for i in event.entry.participants:
+             #   if event.time > node.table.table[node.id][i]:
+              #      node.table.table[node.id][i] = event.time
         
                 
         log.close()
