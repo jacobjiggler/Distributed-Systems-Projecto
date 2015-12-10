@@ -392,6 +392,7 @@ class Acceptor(Agent):
         #self.election_listener.shutdown()
         #self.election_listener.close()
         #self.acceptors = []
+        acceptors = []
         global agent
         i = 0
         for ip in ips:
