@@ -209,6 +209,7 @@ class Proposer(Agent):
                 if not self.maxReceived == {} and proposal[0] > self.maxReceived[0]:
                     maxReceived = proposal
             self.nPromise += 1
+            print 'npromeses: ' + str(self.nPromise) + "/" + str(len(self.acceptors)/2)
             if self.nPromise >= len(self.acceptors)/2:
                 value = self.activeValue
                 if not self.maxReceived == {}:
@@ -355,6 +356,7 @@ class Acceptor(Agent):
                     'type': 'accepted',
                     'from': self.selfnode.id,
                     'n': data['n']
+                    'responce' : 'accepted'
                 }
                 self.send(data['from'], json.dumps(sdata))
             
