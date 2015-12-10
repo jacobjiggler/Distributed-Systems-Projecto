@@ -163,7 +163,7 @@ def main():
         node.agent = paxos.agent
     if (len(argv) == 2):
         while True:
-            print "leader: " + paxos.agent.leader
+            print "leader: " + str(paxos.agent.leader)
             print "[v] View Appointments"
             print "[a] Add Appointment"
             print "[d] Delete Appointment"
