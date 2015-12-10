@@ -48,9 +48,11 @@ class Agent():
     last_heartbeat = []
     votes = []
     def check_heartbeat(self):
+        self.last_heartbeat[self.selfnode.id] = time.time()
         if self.leader == self.selfnode.id:
             return
         if (time.time() - self.last_heartbeat[self.leader]) >= 5:
+            print "tdiff:" + str(time.time() - self.last_heartbeat[self.leader])
             self.elect_leader()
 
     selfnode = None
@@ -100,7 +102,7 @@ class Agent():
             self.leader = mVotesId
             if hasattr(self, 'acceptors'):
                 del self.acceptors[mVotesId]
-            if (self.self.node.id == mVotesId):
+            if (self.selfnode.id == mVotesId):
                 self.become_leader()
     
     def become_leader(self):
@@ -152,6 +154,7 @@ class Proposer(Agent):
             self.calendar = EntrySet.load(calendar)
     
     def tick(self):
+        self.last_heartbeat[self.selfnode.id] = time.time()
         if (activeValue == None and len(self.values) > 0):
             data = {'event':self.values[0], 'hash' : self.calendar.entry_set.hash, 'type' : 'event'}
             self.receive(json.dumps(data))
