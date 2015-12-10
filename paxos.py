@@ -173,15 +173,18 @@ class Proposer(Agent):
         self.current_n = 0
         if calendar:
             if isinstance(calendar, EntrySet):
-                self.calendar = calendar
+                #self.calendar = calendar
+                pass
             else:
-                self.calendar = EntrySet.load(calendar)
+              #  self.calendar = EntrySet.load(calendar)
+              pass
     
     def tick(self):
         self.last_heartbeat[self.selfnode.id] = time.time()
         if (self.activeValue == None and len(self.values) > 0):
-            data = {'event':self.values[0], 'hash' : self.calendar.entry_set.hash, 'type' : 'event'}
-            self.receive(json.dumps(data))
+          #  data = {'event':self.values[0], 'hash' : self.calendar.entry_set.hash, 'type' : 'event'}
+           # self.receive(json.dumps(data))
+           pass
             
     
     def receive(self, data):
@@ -192,12 +195,12 @@ class Proposer(Agent):
             return
         if data['type'] == 'event':
             print "Event: "
-            if self.calendar and self.calendar.entry_set and self.calendar.entry_set.hash != data['hash']:
-                sdata = {
-                    'type' : 'sync',
-                    'calendar' : self.calendar.toJSON()
-                }
-                self.send(data['from'], json.dumps(sdata), 6000)
+         #   if self.calendar and self.calendar.entry_set and self.calendar.entry_set.hash != data['hash']:
+          #      sdata = {
+           #         'type' : 'sync',
+            #        'calendar' : self.calendar.toJSON()
+             #   }
+              #  self.send(data['from'], json.dumps(sdata), 6000)
             if (data['event'] not in self.values):
                 self.values.add(data['event'])
             if self.activeNegiation == True:
