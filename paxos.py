@@ -102,11 +102,9 @@ class Agent():
             self.leader = mVotesId
             if hasattr(self, 'acceptors'):
                 del self.acceptors[mVotesId]
-            if (self.selfnode.id == mVotesId):
+            if (self.selfnode.id == mVotesId and self.selfnode.id != self.leader):
                 self.become_leader()
     
-    def become_leader(self):
-        pass
             
         
         
@@ -140,10 +138,10 @@ class Proposer(Agent):
         self.selfnode = selfnode
         self.votes = [0] * len(ips)
         self.n = self.selfnode.id
-        self.last_heartbeat = [0] * 5
+        self.last_heartbeat = [time.time()] * 5
         self.heartbeat_checker = Timer(10, self.check_heartbeat)
         self.heartbeat_checker.start()
-        self.birthdays = [0] * len(ips)
+        self.birthdays = [time.time()] * len(ips)
         self.thread.start()
         self.thread_election.start()
         self.birthday = time.time()
@@ -332,7 +330,7 @@ class Acceptor(Agent):
     def become_leader(self):
         global ips 
         print 'becoming leader'
-        self.heartbeat_checker.stop()
+        self.heartbeat_checker.close()
         self.listener.shutdown()
         self.listener.server_close()
         self.election_listener.shutdown()
