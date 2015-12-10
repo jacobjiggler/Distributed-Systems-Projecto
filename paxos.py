@@ -16,7 +16,7 @@ class ElectionTCPHandler(SocketServer.BaseRequestHandler):
         global agent
         print "Received TCP: " + str(data)
         if agent:
-            agent.lock.aquire()
+            agent.lock.acquire()
             agent.receive_vote(data)
             agent.lock.release()
         
