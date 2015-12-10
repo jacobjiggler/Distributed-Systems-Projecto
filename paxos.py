@@ -160,7 +160,7 @@ class Proposer(Agent):
         self.birthday = time.time()
         self.ticker = perpetualTimer(5, self.tick)
         self.ticker.start()
-        
+        self.current_n = 0
         if calendar:
             self.calendar = EntrySet.load(calendar)
     
@@ -175,6 +175,8 @@ class Proposer(Agent):
         global ips
         
         print 'received: ' + str(data)
+        if 'n' in data and data['n'] < self.current_n:
+            return
         if data['type'] == 'event':
             print "Event: "
             if self.calendar and self.calendar.entry_set and self.calendar.entry_set.hash != data['hash']:
@@ -196,12 +198,13 @@ class Proposer(Agent):
             
             for acceptor in self.acceptors:
                 self.send(acceptor, json.dumps(data), 6002)
+            self.current_n = self.n
             self.n += len(ips) + 1
             
         elif data['type'] == 'promise':
             if data['responce'] == 'reject':
                 print 'rejected :()'
-                reset()
+                self.reset()
                 return
             proposal = []
             if data['proposals'] != None:
@@ -226,13 +229,13 @@ class Proposer(Agent):
                     
         elif data['type'] == 'accepted':
             if data['responce'] == 'reject':
-                reset()
+                self.reset()
                 return
             self.nAccepted += 1
             print 'nAccepted: ' + str(self.nAccepted) + "/" + str(len(self.acceptors)/2)
 
             if self.nAccepted >= len(self.acceptors)/2:
-                if not self.leader == self.selfnode.id:
+                if  self.leader != self.selfnode.id:
                     data['type'] = 'learn'
                     self.send(self.leader, json.dumps(data), 6001)
                     return
@@ -249,7 +252,7 @@ class Proposer(Agent):
             event.entry = Entry.load(event.entry)
         if not self.selfnode.entry_set.check(event.entry):
             self.values.discard(self.activeValue)
-            reset()
+            self.reset()
             
         d = json.dumps({'type' : 'learn' ,'event': event.to_JSON()})
         i = 0
@@ -266,13 +269,14 @@ class Proposer(Agent):
             self.calendar.add(event)
         else:
             self.calendar.delete(event)
-        reset()
+        self.reset()
         
             
     def reset(self):
         self.activeNegiation = False
         self.activeValue = None
         self.maxReceived = {}
+        self.current_n = self.n
         
     def send(self, _id, message= "", port=6002):
         global ips
