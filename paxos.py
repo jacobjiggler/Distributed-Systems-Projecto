@@ -27,10 +27,11 @@ class AgentUDPHandler(SocketServer.BaseRequestHandler):
     def handle(self):
         data = self.request[0].strip()
         data = json.loads(data)
-        for e in data:
-            print data[e]
         if not 'birthday' in data:
             print "Received UDP: " + str(data)
+        else:
+            for e in data:
+                print data[e]
         global agent
         global ips
         if agent:
