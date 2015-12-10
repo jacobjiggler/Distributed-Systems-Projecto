@@ -106,7 +106,7 @@ class EntrySet():
             self.timestamp = time.time()
             h = hashlib.md5()
             h.update(self.__repr__())
-            self.hash = h.digest()
+            self.hash = h.hexdigest()
             return True
             
     def check(self, entry):
