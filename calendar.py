@@ -104,7 +104,6 @@ class EntrySet():
         for existing_entry in self.calendar:
             if not entry.is_valid(existing_entry):
                 valid = False
-                print "scheduling conflict"
         if entry in self.calendar or not valid:
             return False
         else:

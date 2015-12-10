@@ -101,7 +101,7 @@ class Node():
             print events 
             for e in events:
                 print e
-                print json.load(e)
+                print json.loads(e)
             self.entry_set = EntrySet.load(json.loads(data['calendar']))
 
 
