@@ -45,20 +45,20 @@ class AgentUDPHandler(SocketServer.BaseRequestHandler):
                     agent.send(data['id'], json.dumps(d), 6000)
 
             
-            if 'birthday' in data:
-                agent.birthdays[data['id']] = float(data['birthday'])
-                agent.last_heartbeat[data['id']] = time.time()
-                
-                if agent.leader != data['leader']:
-                    agent.nDiffleader += 1
-                    if agent.nDiffleader >= len(agent.votes)/2:
-                        print 'changing leader to: ' + str(data['leader'])
-                        agent.leader = data['leader']
-                        agent.nDiffleader = 0
-            else:
-                agent.receive(data)
-            if agent.lock.locked():
-                agent.lock.release()
+        if 'birthday' in data:
+            agent.birthdays[data['id']] = float(data['birthday'])
+            agent.last_heartbeat[data['id']] = time.time()
+            
+            if agent.leader != data['leader']:
+                agent.nDiffleader += 1
+                if agent.nDiffleader >= len(agent.votes)/2:
+                    print 'changing leader to: ' + str(data['leader'])
+                    agent.leader = data['leader']
+                    agent.nDiffleader = 0
+        else:
+            agent.receive(data)
+        if agent.lock.locked():
+            agent.lock.release()
     
 
 #For this implemntation, the learner and proposer are the same.     
@@ -82,7 +82,6 @@ class Agent():
     
     
     def elect_leader(self):
-        print 'changing leader'
         if (self.votes == []):
             self.votes = [0] * len(self.last_heartbeat)
         global ips
