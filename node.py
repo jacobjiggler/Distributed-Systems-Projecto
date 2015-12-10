@@ -151,10 +151,10 @@ def main():
             if i != self.id:
                 acceptors.append(i)
             i += 1
-        paxos.agent = Proposer(node, acceptors)
+        paxos.agent = paxos.Proposer(node, acceptors)
         node.agent = paxos.agent
     else:
-        paxos.agent = Acceptor(node)
+        paxos.agent = paxos.Acceptor(node)
         node.agent = paxos.agent
     if (len(argv) == 2):
         while True:
