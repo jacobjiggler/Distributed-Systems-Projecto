@@ -265,7 +265,7 @@ class Proposer(Agent):
             if i == self.selfnode.id:
                 self.selfnode.receive(d)
             else:
-                print 'sending to: ' + i
+                print 'sending to: ' + str(i)
                 self.send(i, d, 6000)
             i += 1
             #will this work to self?
