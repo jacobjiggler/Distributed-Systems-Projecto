@@ -278,6 +278,7 @@ class Acceptor(Agent):
         self.votes = [0] * 5
 
     def receive(self, data):
+        print 'received: ' + str(data)
         if data['type'] == 'prepare':
             print 'prepare: '
             if data['n'] < promise:

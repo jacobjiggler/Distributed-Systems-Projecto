@@ -31,7 +31,6 @@ class NodeUDPHandler(SocketServer.BaseRequestHandler):
 class Node():
     ips = []
     def __init__(self, _id):
-        self.agent = paxos.agent
         self.id = int(_id)
         self.ip = Node.ips[self.id]
         self.lock = Lock()
@@ -69,7 +68,7 @@ class Node():
         for node in Node.ips:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
             data = {'birthday':self.birthday, 'id' : self.id, 'type' : 'heartbeat'}
-            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
             sock.sendto(json.dumps(data), (node, 6001))
             sock.sendto(json.dumps(data), (node, 6002))
 
@@ -91,12 +90,10 @@ class Node():
 
 
     def send(self, event=None):
-        _id = Node.ips[self.agent.leader]
+        _id = Node.ips[paxos.agent.leader]
         data = {'event':event.to_JSON(), 'hash' : self.entry_set.hash, 'type' : 'event'}
-        print self.agent.__dict__
-        print self.agent.leader
-        if (self.agent.leader == self.id):
-            self.agent.receive(data)
+        if (paxos.agent.leader == self.id):
+            paxos.agent.receive(data)
             return
         
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
