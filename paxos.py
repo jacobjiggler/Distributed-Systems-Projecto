@@ -386,12 +386,14 @@ class Acceptor(Agent):
     def become_leader(self):
         global ips 
         print 'becoming leader'
-        #self.heartbeat_checker.cancel()
+        self.heartbeat_checker.cancel()
         #self.listener.shutdown()
-        #self.listener.server_close()
-        #self.election_listener.shutdown()
+        self.election_listener.shutdown = True
+        self.election_listener.server_close()
+        self.listener.shutdown = True
+        self.listener.server_close()
         #self.election_listener.close()
-        #self.acceptors = []
+        self.acceptors = []
         acceptors = []
         global agent
         i = 0
