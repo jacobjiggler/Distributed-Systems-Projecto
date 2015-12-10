@@ -19,7 +19,8 @@ class ElectionTCPHandler(SocketServer.BaseRequestHandler):
         if agent:
             agent.lock.acquire()
             agent.receive_vote(data['vote'])
-            agent.lock.release()
+            if agent.lock.locked():
+                agent.lock.release()
         
 
 
@@ -45,7 +46,8 @@ class AgentUDPHandler(SocketServer.BaseRequestHandler):
                         agent.nDiffleader = 0
             else:
                 agent.receive(data)
-            agent.lock.release()
+            if agent.lock.locked():
+                agent.lock.release()
     
 
 #For this implemntation, the learner and proposer are the same.     
