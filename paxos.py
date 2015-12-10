@@ -116,7 +116,8 @@ class Agent():
             self.leader = mVotesId
             if hasattr(self, 'acceptors'):
                 del self.acceptors[mVotesId]
-            if (self.selfnode.id == mVotesId and self.selfnode.id != self.leader):
+            if (self.selfnode.id == mVotesId):
+                print "I'm the leader!"
                 self.become_leader()
     
             
@@ -295,6 +296,7 @@ class Proposer(Agent):
     
     def become_leader(self):
         self.isLeader = True
+        
         
 
 
