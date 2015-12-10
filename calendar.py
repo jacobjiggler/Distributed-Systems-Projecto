@@ -115,6 +115,7 @@ class EntrySet():
             return True
             
     def check(self, entry):
+        valid = True
         for existing_entry in self.calendar:
             if not entry.is_valid(existing_entry):
                 valid = False
