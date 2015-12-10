@@ -130,19 +130,21 @@ class Node():
         return self.table.get(node_id, event.node) >= event.time
 
 
-    def add_entry(self, entry):
+    def add_entry(self, entry, add=True):
         event = Event(MessageTypes.Insert, time.time(), self.id, entry)
-        self.table.update(self.id, time.time() + 0.1)
-        event.apply(self.entry_set, self)
-        self.events.append(event)
+        if add:
+            self.table.update(self.id, time.time() + 0.1)
+            event.apply(self.entry_set, self)
+            self.events.append(event)
         
         self.send(event)
 
-    def delete_entry(self, entry, exclude=[]):
+    def delete_entry(self, entry, exclude=[], add=True):
         event = Event(MessageTypes.Delete, time.time(), self.id, entry)
-        self.table.update(self.id, time.time() + 0.1)
-        event.apply(self.entry_set, self)
-        self.events.append(event)
+        if add:
+            self.table.update(self.id, time.time() + 0.1)
+            event.apply(self.entry_set, self)
+            self.events.append(event)
 
         self.send(event)
 
@@ -184,12 +186,12 @@ def main():
                 _endTime = raw_input("End Time: ")
 
                 entry = Entry(part, nam, day, _startTime, _endTime)
-                node.add_entry(entry)
+                node.add_entry(entry, False)
 
             elif resp == 'd':
                 resp = int(raw_input("Enter Appointment number: "))
                 entry = node.entry_set[resp]
-                node.delete_entry(entry)
+                node.delete_entry(entry, [], False)
             elif resp == 'q':
                 #node.kill_thread()
                 sys.exit(0)
