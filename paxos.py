@@ -75,7 +75,7 @@ class Agent():
         min_bday_id = 0
         i = 0
         for birthday in self.birthdays:
-            if birthday < min_bday:
+            if birthday < min_bday and (time.time() - self.last_heartbeat[i]) >= 7.5:
                 min_bday = birthday
                 min_bday_id = i
             i +=1
@@ -150,7 +150,7 @@ class Proposer(Agent):
         self.last_heartbeat = [time.time()] * 5
         self.heartbeat_checker = perpetualTimer(8, self.check_heartbeat)
         self.heartbeat_checker.start()
-        self.birthdays = [time.time()] * len(ips)
+        self.birthdays = [0] * len(ips)
         self.thread.start()
         self.thread_election.start()
         self.birthday = time.time()
