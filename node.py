@@ -97,7 +97,7 @@ class Node():
             
         elif data['type'] == 'sync':
             print data['events']
-            events = json.load(data['events'])
+            events = json.loads(data['events'])
             print events 
             for e in events:
                 print e
