@@ -183,11 +183,11 @@ class Proposer(Agent):
                     'calendar' : self.calendar.toJSON()
                 }
                 self.send(data['from'], json.dumps(sdata), 6000)
-            if (data['value'] not in self.values):
-                self.values.add(data['value'])
+            if (data['event'] not in self.values):
+                self.values.add(data['event'])
             if self.activeNegiation == True:
                 return
-            self.activeValue = data['value']
+            self.activeValue = data['event']
             data = {
                 'type': 'prepare',
                 'from': self.id,
