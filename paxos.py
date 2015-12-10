@@ -27,7 +27,8 @@ class AgentUDPHandler(SocketServer.BaseRequestHandler):
     def handle(self):
         data = self.request[0].strip()
         data = json.loads(data)
-        print "Received UDP: " + str(data)
+        if not 'birthday' in data:
+            print "Received UDP: " + str(data)
         global agent
         global ips
         if agent:
@@ -52,7 +53,7 @@ class Agent():
         self.last_heartbeat[self.selfnode.id] = time.time()
         if self.leader == self.selfnode.id:
             return
-        if (time.time() - self.last_heartbeat[self.leader]) >= 7:
+        if (time.time() - self.last_heartbeat[self.leader]) >= 7.5:
             print "tdiff:" + str(time.time() - self.last_heartbeat[self.leader])
             self.elect_leader()
 
@@ -140,7 +141,7 @@ class Proposer(Agent):
         self.votes = [0] * len(ips)
         self.n = self.selfnode.id
         self.last_heartbeat = [time.time()] * 5
-        self.heartbeat_checker = perpetualTimer(10, self.check_heartbeat)
+        self.heartbeat_checker = perpetualTimer(8, self.check_heartbeat)
         self.heartbeat_checker.start()
         self.birthdays = [time.time()] * len(ips)
         self.thread.start()

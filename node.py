@@ -42,7 +42,7 @@ class Node():
         self.thread = Thread(target = self.listener.serve_forever)
         self.thread.start()
         
-        self.heartbeat_timer = perpetualTimer(2, self.heartbeat)
+        self.heartbeat_timer = perpetualTimer(3, self.heartbeat)
         self.heartbeat_timer.start()
         
         
