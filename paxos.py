@@ -190,7 +190,7 @@ class Proposer(Agent):
             self.activeValue = data['event']
             data = {
                 'type': 'prepare',
-                'from': self.id,
+                'from': self.selfnode.id,
                 'n': n,
             }
             
@@ -213,7 +213,7 @@ class Proposer(Agent):
                     self.activeValue = self.maxReceived
                 sdata = {
                     'type': 'accept',
-                    'from': self.id,
+                    'from': self.selfnode.id,
                     'n': data['n'],
                     'value' : json.dumps(self.activeValue)
                 }
@@ -332,7 +332,7 @@ class Acceptor(Agent):
             
             sdata = {
                 'type': 'accepted',
-                'from': self.id,
+                'from': self.selfnode.id,
                 'n': data['n']
             }
             self.send(leader, json.dumps(sdata))
@@ -357,7 +357,7 @@ class Acceptor(Agent):
         global agent
         i = 0
         for ip in ips:
-            if i != self.id:
+            if i != self.selfnode.id:
                 acceptors.append(i)
         p = Proposer(self.selfnode, acceptors, self.selfnode.entry_set)
         agent = p
