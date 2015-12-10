@@ -68,6 +68,7 @@ class Agent():
     
     
     def elect_leader(self):
+        print 'changing leader'
         if (self.votes == []):
             self.votes = [0] * len(self.last_heartbeat)
         global ips
