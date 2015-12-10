@@ -83,14 +83,14 @@ class Node():
         print "received: " + str(data)
         
         if data['type'] == "learn":
-            event = Event.load(data['event'])
+            event = Event.load(json.loads(data['event']))
             print 'learning' + str(event)
             res = event.apply(self.entry_set, self)
             if res:
                 self.events.append(event)
             
         elif data['type'] == 'sync':
-            self.entry_set = EntrySet.load(data['calendar'])
+            self.entry_set = EntrySet.load(json.loads(data['calendar']))
 
 
     def send(self, event=None):
