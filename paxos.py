@@ -29,9 +29,6 @@ class AgentUDPHandler(SocketServer.BaseRequestHandler):
         data = json.loads(data)
         if not 'birthday' in data:
             print "Received UDP: " + str(data)
-        elif not 'heartbeat' in data:
-            for e in data:
-                print data[e]
         global agent
         global ips
         if agent:
