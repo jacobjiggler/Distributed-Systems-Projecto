@@ -14,6 +14,7 @@ class ElectionTCPHandler(SocketServer.BaseRequestHandler):
         data = self.request.recv(1024).strip()
         data = json.loads(data)
         global agent
+        print "Received TCP: " + data
         if agent:
             agent.lock.aquire()
             agent.receive_vote(data)
@@ -25,6 +26,7 @@ class AgentUDPHandler(SocketServer.BaseRequestHandler):
     def handle(self):
         data = self.request.recv(1024).strip()
         data = json.loads(data)
+        print "Received UDP: " + data
         global agent
         global ips
         if agent:
@@ -151,9 +153,10 @@ class Proposer(Agent):
     
     def receive(self, data):
         global ips
-
+        
         data = json.loads(data)
         if data['type'] == 'event':
+            print "Event: "
             if self.calendar.entry_set.hash != data['hash']:
                 sdata = {
                     'type' : 'sync',
@@ -260,7 +263,7 @@ class Acceptor(Agent):
 
     def receive(self, data):
         if data['type'] == 'prepare':
-
+            print 'prepare: '
             if data['n'] < promise:
                 data = {
                     'type': 'promise',
@@ -286,6 +289,7 @@ class Acceptor(Agent):
             
             
         elif data['type'] == 'accept':
+            print 'accept'
             if self.promise > data['n']:
                 sdata = {
                     'type': 'accepted',
@@ -311,7 +315,7 @@ class Acceptor(Agent):
         
     def become_leader(self):
         global ips 
-        
+        print 'becoming leader'
         heartbeat_checker.stop()
         listener.shutdown()
         listener.server_close()

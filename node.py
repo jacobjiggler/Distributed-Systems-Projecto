@@ -29,6 +29,8 @@ class NodeUDPHandler(SocketServer.BaseRequestHandler):
 class Node():
     ips = []
     def __init__(self, _id):
+        global agent
+        self.agent = agent
         self.id = int(_id)
         self.ip = Node.ips[self.id]
         self.lock = Lock()
@@ -49,7 +51,6 @@ class Node():
         self.last = None
         
         #first is default leader. If leader goes down, elections occur.
-        self.leader = 0 #aka acceptor
 
         if os.path.isfile("log.dat"):
             self.entry_set.create_from_log(self)
@@ -77,6 +78,7 @@ class Node():
     # {'type' => type, 'calendar' => Entry_Set, 'value' => Entry }
     def receive(self, raw):
         data = json.loads(raw)
+        print "received: " + data
         if data['type'] == "learn":
             event = Event.load(data['event'])
             res = event.apply(self.entry_set, self)
@@ -151,9 +153,9 @@ def main():
             if i != self.id:
                 acceptors.append(i)
             i += 1
-        agent = Proposer(node, acceptors)
+        paxos.agent = Proposer(node, acceptors)
     else:
-        agent = Acceptor(node)
+        paxos.agent = Acceptor(node)
     if (len(argv) == 2):
         while True:
             print "[v] View Appointments"
