@@ -224,21 +224,21 @@ class Proposer(Agent):
                 for acceptor in self.acceptors:
                     self.send(acceptor, json.dumps(sdata), 6002)
                     
-            elif data['type'] == 'accepted':
-                if data['responce'] == 'reject':
-                    reset()
-                    return
-                self.nAccepted += 1
-                print 'nAccepted: ' + str(self.nAccepted) + "/" + str(len(self.acceptors)/2)
+        elif data['type'] == 'accepted':
+            if data['responce'] == 'reject':
+                reset()
+                return
+            self.nAccepted += 1
+            print 'nAccepted: ' + str(self.nAccepted) + "/" + str(len(self.acceptors)/2)
 
-                if self.nAccepted >= len(self.acceptors)/2:
-                    if not self.leader == self.selfnode.id:
-                        data['type'] = 'learn'
-                        self.send(self.leader, json.dumps(data), 6001)
-                        return
-                    self.learn(data)
-            elif data['type'] == 'learn':
+            if self.nAccepted >= len(self.acceptors)/2:
+                if not self.leader == self.selfnode.id:
+                    data['type'] = 'learn'
+                    self.send(self.leader, json.dumps(data), 6001)
+                    return
                 self.learn(data)
+        elif data['type'] == 'learn':
+            self.learn(data)
 
                 
     def learn(self, data):
