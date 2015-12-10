@@ -125,11 +125,11 @@ class Agent():
                 mVotesId = i
             i += 1
         
-        if nVotes == len(self.votes) - 2:
+        if nVotes >= len(self.votes)/2:
             self.leader = mVotesId
-            if hasattr(self, 'acceptors'):
-                del self.acceptors[mVotesId]
             if (self.selfnode.id == mVotesId):
+                if hasattr(self, 'acceptors'):
+                    self.acceptors.remove(mVotesId)
                 self.become_leader()
     
             
