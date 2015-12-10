@@ -250,6 +250,7 @@ class Proposer(Agent):
         event = Event.load(json.loads(self.activeValue))
 
         if event.entry and not isinstance(event.entry, Entry):
+            print 'event.entry: ' + str(event.entry)
             event.entry = Entry.load(json.loads(event.entry))
         if not self.selfnode.entry_set.check(event.entry):
             self.values.discard(self.activeValue)
