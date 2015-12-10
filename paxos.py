@@ -249,7 +249,7 @@ class Proposer(Agent):
         print 'learning data'
         event = Event.load(json.loads(self.activeValue))
 
-        if event.entry:
+        if event.entry and not isinstance(event.entry, Entry):
             event.entry = Entry.load(json.loads(event.entry))
         if not self.selfnode.entry_set.check(event.entry):
             self.values.discard(self.activeValue)
