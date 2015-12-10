@@ -227,32 +227,40 @@ class Proposer(Agent):
                     return
                 self.nAccepted += 1
                 if self.nAccepted >= len(self.acceptors)/2:
-                    if not self.isLeader:
+                    if not self.leader == self.selfnode.id:
                         data['type'] = 'learn'
                         self.send(self.leader, data, 6001)
                         return
-                    event = Event.load(json.loads(self.activeValue))
-                    if event.entry:
-                        event.entry = Entry.load(event.entry)
-                    if not self.selfnode.entry_set.check(event.entry):
-                        values.discard(self.activeValue)
-                        reset()
-                        
-                    d = json.dumps({'type' : 'learn' ,'event': event.to_JSON()})
-                    i = 0
-                    for node in ips:
-                        if i == self.selfnode.id:
-                            self.selfnode.receive(d)
-                        else:
-                            self.send(i, d, 6000)
-                        i += 1
-                        #will this work to self?
-                    values.discard(self.activeValue)
-                    if (event.type == 0):
-                        self.calendar.add(event)
-                    else:
-                        self.calendar.delete(event)
-                    reset()
+                    self.learn(data)
+            elif data['type'] == 'learn':
+                self.learn(data)
+
+                
+    def learn(self, data):
+        global ips
+        event = Event.load(json.loads(self.activeValue))
+        if event.entry:
+            event.entry = Entry.load(event.entry)
+        if not self.selfnode.entry_set.check(event.entry):
+            values.discard(self.activeValue)
+            reset()
+            
+        d = json.dumps({'type' : 'learn' ,'event': event.to_JSON()})
+        i = 0
+        for node in ips:
+            if i == self.selfnode.id:
+                self.selfnode.receive(d)
+            else:
+                self.send(i, d, 6000)
+            i += 1
+            #will this work to self?
+        values.discard(self.activeValue)
+        if (event.type == 0):
+            self.calendar.add(event)
+        else:
+            self.calendar.delete(event)
+        reset()
+        
             
     def reset(self):
         self.activeNegiation = False
