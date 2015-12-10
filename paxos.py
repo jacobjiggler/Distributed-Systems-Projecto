@@ -270,10 +270,11 @@ class Proposer(Agent):
             i += 1
             #will this work to self?
         self.values.discard(self.activeValue)
-        if (event.type == 0):
-            self.calendar.add(event)
-        else:
-            self.calendar.delete(event)
+        if self.calendar:
+            if (event.type == 0):
+                self.calendar.add(event)
+            else:
+                self.calendar.delete(event)
         self.reset()
         
             

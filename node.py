@@ -90,6 +90,8 @@ class Node():
                 else:
                     event.entry = Entry.load(json.loads(event.entry))
             print 'learning' + str(event)
+            if self.id not in event.entry.participants:
+                return
             res = event.apply(self.entry_set, self)
             if res:
                 self.events.append(event)
