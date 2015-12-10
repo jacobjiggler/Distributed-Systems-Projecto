@@ -81,8 +81,10 @@ class Node():
     def receive(self, raw):
         data = json.loads(raw)
         print "received: " + data
+        
         if data['type'] == "learn":
             event = Event.load(data['event'])
+            print 'learning' + str(event)
             res = event.apply(self.entry_set, self)
             if res:
                 self.events.append(event)

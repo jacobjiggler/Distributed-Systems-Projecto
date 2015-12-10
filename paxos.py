@@ -229,7 +229,7 @@ class Proposer(Agent):
                 if self.nAccepted >= len(self.acceptors)/2:
                     if not self.leader == self.selfnode.id:
                         data['type'] = 'learn'
-                        self.send(self.leader, data, 6001)
+                        self.send(self.leader, json.dumps(data), 6001)
                         return
                     self.learn(data)
             elif data['type'] == 'learn':
@@ -238,6 +238,7 @@ class Proposer(Agent):
                 
     def learn(self, data):
         global ips
+        print 'learning data'
         event = Event.load(json.loads(self.activeValue))
         if event.entry:
             event.entry = Entry.load(event.entry)
@@ -251,6 +252,7 @@ class Proposer(Agent):
             if i == self.selfnode.id:
                 self.selfnode.receive(d)
             else:
+                print 'sending to: ' + i
                 self.send(i, d, 6000)
             i += 1
             #will this work to self?
