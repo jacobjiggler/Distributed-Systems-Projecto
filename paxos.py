@@ -397,6 +397,8 @@ class Acceptor(Agent):
         for ip in ips:
             if i != self.selfnode.id:
                 acceptors.append(i)
+        print agent
+        print "?"
         p = Proposer(self.selfnode, acceptors, self.selfnode.entry_set)
         p.isLeader = True
         p.leader = self.selfnode.id
