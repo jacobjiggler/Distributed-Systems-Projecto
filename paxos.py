@@ -173,7 +173,6 @@ class Proposer(Agent):
     def receive(self, data):
         global ips
         
-        data = json.loads(data)
         print 'received: ' + str(data)
         if data['type'] == 'event':
             print "Event: "
