@@ -1,7 +1,7 @@
 from threading import Thread, Lock, Timer
 import Queue
 import SocketServer
-from calendar import EntrySet
+from calendar import EntrySet, Entry
 import time
 import socket
 import json
