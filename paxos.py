@@ -6,7 +6,7 @@ import time
 import socket
 
 agent = None
-ips = open('ip', 'r').read().split("\n")[0:4]
+ips = open('ip', 'r').read().split("\n")[0:5]
 
 
 class ElectionTCPHandler(SocketServer.BaseRequestHandler):

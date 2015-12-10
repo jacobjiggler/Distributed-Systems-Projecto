@@ -140,7 +140,7 @@ class Node():
 def main():
     global node
     global agent
-    Node.ips = open('ip', 'r').read().split("\n")[0:4]
+    Node.ips = open('ip', 'r').read().split("\n")[0:5]
     node_id = int(argv[1])
     node = Node(node_id)
     
