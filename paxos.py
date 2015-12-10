@@ -355,7 +355,7 @@ class Acceptor(Agent):
                 sdata = {
                     'type': 'accepted',
                     'from': self.selfnode.id,
-                    'n': data['n']
+                    'n': data['n'],
                     'responce' : 'accepted'
                 }
                 self.send(data['from'], json.dumps(sdata))
