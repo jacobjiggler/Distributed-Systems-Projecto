@@ -225,6 +225,7 @@ class Proposer(Agent):
                 if data['responce'] == 'reject':
                     reset()
                     return
+                self.nAccepted += 1
                 if self.nAccepted >= len(self.acceptors)/2:
                     if not self.isLeader:
                         data['type'] = 'learn'
@@ -233,14 +234,17 @@ class Proposer(Agent):
                     event = Event.load(json.loads(self.activeValue))
                     if event.entry:
                         event.entry = Entry.load(event.entry)
-                    if not self.node.entry_set.check(event.entry):
+                    if not self.selfnode.entry_set.check(event.entry):
                         values.discard(self.activeValue)
                         reset()
                         
                     d = json.dumps({'type' : 'learn' ,'event': event.to_JSON()})
                     i = 0
                     for node in ips:
-                        self.send(i, d, 6000)
+                        if i == self.selfnode.id:
+                            self.selfnode.receive(d)
+                        else:
+                            self.send(i, d, 6000)
                         i += 1
                         #will this work to self?
                     values.discard(self.activeValue)
