@@ -17,7 +17,7 @@ class ElectionTCPHandler(SocketServer.BaseRequestHandler):
         print "Received TCP: " + str(data)
         if agent:
             agent.lock.acquire()
-            agent.receive_vote(data)
+            agent.receive_vote(data['vote'])
             agent.lock.release()
         
 
@@ -32,7 +32,7 @@ class AgentUDPHandler(SocketServer.BaseRequestHandler):
         if agent:
             agent.lock.acquire()
             if 'birthday' in data:
-                agent.birthdays[data['id']] = data['birthday']
+                agent.birthdays[data['id']] = float(data['birthday'])
                 agent.last_heartbeat[data['id']] = time.time()
             else:
                 agent.receive(data)
@@ -48,6 +48,8 @@ class Agent():
     last_heartbeat = []
     votes = []
     def check_heartbeat(self):
+        if self.leader == self.selfnode.id:
+            return
         if (time.time() - self.last_heartbeat[self.leader]) >= 5:
             self.elect_leader()
 
