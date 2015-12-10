@@ -258,7 +258,7 @@ class Proposer(Agent):
         i = 0
         for node in ips:
             if i == self.selfnode.id:
-                self.selfnode.receive(json.loads(d))
+                self.selfnode.receive(d)
             else:
                 print 'sending to: ' + i
                 self.send(i, d, 6000)
