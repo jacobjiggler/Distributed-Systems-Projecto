@@ -201,7 +201,9 @@ class Proposer(Agent):
             if data['responce'] == 'reject':
                 reset()
                 return
-            proposal = json.loads(data['proposals'])
+            proposal = []
+            if data['proposals'] != None:
+                proposal = json.loads(data['proposals'])
             if not proposal == []:
                 if not self.maxReceived == {} and proposal[0] > self.maxReceived[0]:
                     maxReceived = proposal
