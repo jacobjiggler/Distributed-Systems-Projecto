@@ -185,6 +185,8 @@ def main():
             resp = raw_input("Choice: ").lower()
             if resp == 'v':
                 print node.entry_set.__repr__()
+                print paxos.agent
+                print paxos.agent.__dict__
 
             elif resp == 'a':
                 part = map(int, raw_input("Node Ids of participants (comma seperated): ").split(","))

@@ -400,7 +400,10 @@ class Acceptor(Agent):
         p = Proposer(self.selfnode, acceptors, self.selfnode.entry_set)
         p.isLeader = True
         p.leader = self.selfnode.id
+        print agent
         agent = p
+        print agent
+        print agent.__dict__
         
     
             
