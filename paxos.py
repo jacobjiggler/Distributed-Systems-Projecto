@@ -31,7 +31,7 @@ class AgentUDPHandler(SocketServer.BaseRequestHandler):
         global ips
         if agent:
             agent.lock.acquire()
-            if birthday in data:
+            if 'birthday' in data:
                 agent.birthdays[data['id']] = data['birthday']
                 agent.last_heartbeat[data['id']] = time.time()
             else:
