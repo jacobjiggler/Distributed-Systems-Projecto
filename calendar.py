@@ -6,12 +6,13 @@ import os
 import hashlib
 
 class Entry():
-    def __init__(self, participants=None, name = None, day=None, start=None, end=None):
+    def __init__(self, participants=None, name = None, day=None, start=None, end=None, me=None):
         self.participants = participants
         self.name = name
         self.day = day
         self.start = start
         self.end = end
+        self.me = me
 
     def __repr__(self):
         return "Participants: %s, Name: %s, Day: %s, Time: %s - %s" % (self.participants, self.name, self.day, self.start, self.end)

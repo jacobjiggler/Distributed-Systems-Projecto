@@ -90,7 +90,7 @@ class Node():
                 else:
                     event.entry = Entry.load(json.loads(event.entry))
             print 'learning' + str(event)
-            if self.id not in event.entry.participants:
+            if self.id != event.entry.me and self.id not in event.entry.participants:
                 return
             res = event.apply(self.entry_set, self)
             if res:
@@ -102,6 +102,7 @@ class Node():
 
     def send(self, event=None):
         _id = Node.ips[paxos.agent.leader]
+        event.me = self.id
         data = {'event':event.to_JSON(), 'hash' : self.entry_set.hash, 'type' : 'event'}
         if (paxos.agent.leader == self.id):
             print 'sending to self'
