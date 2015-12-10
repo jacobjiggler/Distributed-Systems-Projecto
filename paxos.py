@@ -272,6 +272,7 @@ class Acceptor(Agent):
         self.thread.start()
         self.thread_election.start()
         self.heartbeat_checker.start()
+        self.votes = [0] * 5
 
     def receive(self, data):
         if data['type'] == 'prepare':
