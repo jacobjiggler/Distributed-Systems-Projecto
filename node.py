@@ -96,11 +96,8 @@ class Node():
                 paxos.agent.events.append(event)
             
         elif data['type'] == 'sync':
-            print data['events']
             events = json.loads(data['events'])
-            print events 
             for e in events:
-                
                 self.receive(json.dumps({ "type" : 'learn', 'event' : e }))
 
 
