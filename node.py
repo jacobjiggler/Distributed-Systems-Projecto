@@ -91,13 +91,15 @@ class Node():
     def send(self, event=None):
         _id = Node.ips[self.agent.leader]
         data = {'event':event.to_JSON(), 'hash' : self.entry_set.hash, 'type' : 'event'}
+        print self.agent
+        print self.agent.leader
         if (self.agent.leader == self.id):
             self.agent.receive(data)
             return
         
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
         data = {'event':event.to_JSON(), 'hash' : self.entry_set.hash, 'type' : 'event'}
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         sock.sendto(json.dumps(data), (_id, 6001))
 
     def send_failure(self, event):
