@@ -138,6 +138,7 @@ class Proposer(Agent):
     birthdays = []
     birthday = 0
     last_heartbeat = []
+    nAccepted = 0
     
     def __init__(self,  selfnode, acceptors, calendar=None):
         global ips
@@ -228,6 +229,8 @@ class Proposer(Agent):
                     reset()
                     return
                 self.nAccepted += 1
+                print 'nAccepted: ' + str(self.nAccepted) + "/" + str(len(self.acceptors)/2)
+
                 if self.nAccepted >= len(self.acceptors)/2:
                     if not self.leader == self.selfnode.id:
                         data['type'] = 'learn'
