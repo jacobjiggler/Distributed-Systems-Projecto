@@ -386,7 +386,7 @@ class Acceptor(Agent):
     def become_leader(self):
         global ips 
         print 'becoming leader'
-        self.heartbeat_checker.close()
+        self.heartbeat_checker.cancel()
         self.listener.shutdown()
         self.listener.server_close()
         self.election_listener.shutdown()
