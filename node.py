@@ -84,7 +84,7 @@ class Node():
         
         if data['type'] == "learn":
             event = Event.load(json.loads(data['event']))
-            event.entry = Entry.load(event.entry)
+            event.entry = Entry.load(json.loads(event.entry))
             print 'learning' + str(event)
             res = event.apply(self.entry_set, self)
             if res:
