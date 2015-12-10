@@ -30,7 +30,21 @@ class AgentUDPHandler(SocketServer.BaseRequestHandler):
         global agent
         global ips
         if agent:
-            agent.lock.acquire()
+            agent.lock.acquire()                    
+            
+        if 'nEvents' in data and agent.leader == agent.selfnode.id:
+            if data['nEvents'] < len(self.events):
+                sEvents = []
+                for i in range(data['nEvents'], len(self.events)):
+                    sEvents.append( self.events[i].to_JSON() )
+                    d = {
+                        'type' : 'sync',
+                        'events' : json.dumps(sEvents)
+                    }
+                    
+                    agent.send(data['id'], json.dumps(d), 6000)
+
+            
             if 'birthday' in data:
                 agent.birthdays[data['id']] = float(data['birthday'])
                 agent.last_heartbeat[data['id']] = time.time()
@@ -56,6 +70,7 @@ class Agent():
     birthdays = []
     last_heartbeat = []
     votes = []
+    events = []
     def check_heartbeat(self):
         self.last_heartbeat[self.selfnode.id] = time.time()
         if self.leader == self.selfnode.id:
@@ -187,8 +202,10 @@ class Proposer(Agent):
         
         if 'n' in data and data['n'] < self.current_n:
             return
+                
+        
         if data['type'] == 'event':
-         #   if self.calendar and self.calendar.entry_set and self.calendar.entry_set.hash != data['hash']:
+
           #      sdata = {
            #         'type' : 'sync',
             #        'calendar' : self.calendar.toJSON()

@@ -69,7 +69,7 @@ class Node():
             return
         for node in Node.ips:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
-            data = {'birthday':self.birthday, 'id' : self.id, 'type' : 'heartbeat', 'leader' : paxos.agent.leader}
+            data = {'birthday':self.birthday, 'nEvents' : len(self.agent.events), 'id' : self.id, 'type' : 'heartbeat', 'leader' : paxos.agent.leader}
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
             sock.sendto(json.dumps(data), (node, 6001))
             sock.sendto(json.dumps(data), (node, 6002))
@@ -89,19 +89,25 @@ class Node():
                 else:
                     event.entry = Entry.load(json.loads(event.entry))
             if self.id not in event.entry.participants:
+                self.agent.events.append(event)
                 return
             res = event.apply(self.entry_set, self)
             if res:
-                self.events.append(event)
+                self.agent.events.append(event)
             
         elif data['type'] == 'sync':
+            events = json.load(data['events'])
+            print events 
+            for e in events:
+                print e
+                print json.load(e)
             self.entry_set = EntrySet.load(json.loads(data['calendar']))
 
 
     def send(self, event=None):
         _id = Node.ips[paxos.agent.leader]
         event.me = self.id
-        data = {'event':event.to_JSON(), 'hash' : self.entry_set.hash, 'type' : 'event'}
+        data = {'event':event.to_JSON(),  'type' : 'event'}
         if (paxos.agent.leader == self.id):
             paxos.agent.receive(data)
             return
