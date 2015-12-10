@@ -14,7 +14,7 @@ class ElectionTCPHandler(SocketServer.BaseRequestHandler):
         data = self.request.recv(1024).strip()
         data = json.loads(data)
         global agent
-        print "Received TCP: " + data
+        print "Received TCP: " + str(data)
         if agent:
             agent.lock.aquire()
             agent.receive_vote(data)
@@ -26,7 +26,7 @@ class AgentUDPHandler(SocketServer.BaseRequestHandler):
     def handle(self):
         data = self.request[0].strip()
         data = json.loads(data)
-        print "Received UDP: " + data
+        print "Received UDP: " + str(data)
         global agent
         global ips
         if agent:
@@ -159,7 +159,7 @@ class Proposer(Agent):
         global ips
         
         data = json.loads(data)
-        print 'received: ' + data
+        print 'received: ' + str(data)
         if data['type'] == 'event':
             print "Event: "
             if self.calendar.entry_set.hash != data['hash']:
