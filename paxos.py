@@ -170,7 +170,10 @@ class Proposer(Agent):
         self.ticker.start()
         self.current_n = 0
         if calendar:
-            self.calendar = EntrySet.load(calendar)
+            if isinstance(EntrySet, calendar):
+                self.calendar = calendar
+            else:
+                self.calendar = EntrySet.load(calendar)
     
     def tick(self):
         self.last_heartbeat[self.selfnode.id] = time.time()
