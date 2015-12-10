@@ -77,7 +77,7 @@ class Agent():
         min_bday_id = 0
         i = 0
         for birthday in self.birthdays:
-            if birthday < min_bday and (time.time() - self.last_heartbeat[i]) >= 7.5 and i != self.leader:
+            if birthday != 0 && self.last_heartbeat[i] != 0 && birthday < min_bday and (time.time() - self.last_heartbeat[i]) >= 7.5 and i != self.leader:
                 min_bday = birthday
                 min_bday_id = i
             i +=1
