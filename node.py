@@ -8,7 +8,7 @@ import socket
 import time
 import calendar
 import os
-from paxos import *
+import paxos
 from threading import Timer
 
 from event import Event, MessageTypes
@@ -29,8 +29,7 @@ class NodeUDPHandler(SocketServer.BaseRequestHandler):
 class Node():
     ips = []
     def __init__(self, _id):
-        global agent
-        self.agent = agent
+        self.agent = paxos.agent
         self.id = int(_id)
         self.ip = Node.ips[self.id]
         self.lock = Lock()
@@ -141,7 +140,6 @@ class Node():
 
 def main():
     global node
-    global agent
     Node.ips = open('ip', 'r').read().split("\n")[0:5]
     node_id = int(argv[1])
     node = Node(node_id)
@@ -154,8 +152,10 @@ def main():
                 acceptors.append(i)
             i += 1
         paxos.agent = Proposer(node, acceptors)
+        node.agent = paxos.agent
     else:
         paxos.agent = Acceptor(node)
+        node.agent = paxos.agent
     if (len(argv) == 2):
         while True:
             print "[v] View Appointments"
