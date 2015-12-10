@@ -80,7 +80,6 @@ class Node():
     # {'type' => type, 'calendar' => Entry_Set, 'value' => Entry }
     def receive(self, raw):
         data = json.loads(raw)
-        print "received: " + str(data)
         
         if data['type'] == "learn":
             event = Event.load(json.loads(data['event']))
@@ -89,7 +88,6 @@ class Node():
                     event.entry = Entry.load(event.entry)
                 else:
                     event.entry = Entry.load(json.loads(event.entry))
-            print 'learning' + str(event)
             if self.id not in event.entry.participants:
                 return
             res = event.apply(self.entry_set, self)
@@ -105,7 +103,6 @@ class Node():
         event.me = self.id
         data = {'event':event.to_JSON(), 'hash' : self.entry_set.hash, 'type' : 'event'}
         if (paxos.agent.leader == self.id):
-            print 'sending to self'
             paxos.agent.receive(data)
             return
         

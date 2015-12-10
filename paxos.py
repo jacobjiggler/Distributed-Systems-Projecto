@@ -15,7 +15,6 @@ class ElectionTCPHandler(SocketServer.BaseRequestHandler):
         data = self.request.recv(1024).strip()
         data = json.loads(data)
         global agent
-        print "Received TCP: " + str(data)
         if agent:
             agent.lock.acquire()
             agent.receive_vote(data['vote'])
@@ -28,8 +27,6 @@ class AgentUDPHandler(SocketServer.BaseRequestHandler):
     def handle(self):
         data = self.request[0].strip()
         data = json.loads(data)
-        if not 'birthday' in data:
-            print "Received UDP: " + str(data)
         global agent
         global ips
         if agent:
@@ -64,7 +61,6 @@ class Agent():
         if self.leader == self.selfnode.id:
             return
         if (time.time() - self.last_heartbeat[self.leader]) >= 7.5:
-            print "tdiff:" + str(time.time() - self.last_heartbeat[self.leader])
             self.elect_leader()
 
     selfnode = None
@@ -120,7 +116,6 @@ class Agent():
             if hasattr(self, 'acceptors'):
                 del self.acceptors[mVotesId]
             if (self.selfnode.id == mVotesId):
-                print "I'm the leader!"
                 self.become_leader()
     
             
@@ -190,11 +185,9 @@ class Proposer(Agent):
     def receive(self, data):
         global ips
         
-        print 'received: ' + str(data)
         if 'n' in data and data['n'] < self.current_n:
             return
         if data['type'] == 'event':
-            print "Event: "
          #   if self.calendar and self.calendar.entry_set and self.calendar.entry_set.hash != data['hash']:
           #      sdata = {
            #         'type' : 'sync',
@@ -219,7 +212,6 @@ class Proposer(Agent):
             
         elif data['type'] == 'promise':
             if data['responce'] == 'reject':
-                print 'rejected :()'
                 self.reset()
                 return
             proposal = []
@@ -229,7 +221,6 @@ class Proposer(Agent):
                 if not self.maxReceived == {} and proposal[0] > self.maxReceived[0]:
                     maxReceived = proposal
             self.nPromise += 1
-            print 'npromeses: ' + str(self.nPromise) + "/" + str(len(self.acceptors)/2)
             if self.nPromise >= len(self.acceptors)/2:
                 value = self.activeValue
                 if not self.maxReceived == {}:
@@ -248,7 +239,6 @@ class Proposer(Agent):
                 self.reset()
                 return
             self.nAccepted += 1
-            print 'nAccepted: ' + str(self.nAccepted) + "/" + str(len(self.acceptors)/2)
 
             if self.nAccepted >= len(self.acceptors)/2:
                 if  self.leader != self.selfnode.id:
@@ -262,7 +252,6 @@ class Proposer(Agent):
                 
     def learn(self, data):
         global ips
-        print 'learning data'
         event = Event.load(json.loads(self.activeValue))
 
         if event.entry and not isinstance(event.entry, Entry):
@@ -281,7 +270,6 @@ class Proposer(Agent):
             if i == self.selfnode.id:
                 self.selfnode.receive(d)
             else:
-                print 'sending to: ' + str(i)
                 self.send(i, d, 6000)
             i += 1
             #will this work to self?
@@ -302,8 +290,6 @@ class Proposer(Agent):
         
     def send(self, _id, message= "", port=6002):
         global ips
-        print "Sending to " + str(_id) + " " + ips[_id]
-        print message
         _id = ips[_id]
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -345,11 +331,8 @@ class Acceptor(Agent):
         self.votes = [0] * 5
 
     def receive(self, data):
-        print 'received (accept): ' + str(data)
         if data['type'] == 'prepare':
-            print 'prepare: '
             if data['n'] < self.promise:
-                print 'REJECTED!'
                 data = {
                     'type': 'promise',
                     'responce': 'reject',
@@ -374,7 +357,6 @@ class Acceptor(Agent):
             
             
         elif data['type'] == 'accept':
-            print 'accept'
             if self.promise > data['n']:
                 sdata = {
                     'type': 'accepted',
@@ -394,7 +376,6 @@ class Acceptor(Agent):
             
     def send(self, _id, message, port=6001):
         global ips
-        print "Sending to " + str(_id) + " " + ips[_id]
         _id = ips[_id]
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
