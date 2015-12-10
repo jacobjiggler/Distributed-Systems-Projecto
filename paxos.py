@@ -162,7 +162,7 @@ class Proposer(Agent):
     
     def tick(self):
         self.last_heartbeat[self.selfnode.id] = time.time()
-        if (activeValue == None and len(self.values) > 0):
+        if (self.activeValue == None and len(self.values) > 0):
             data = {'event':self.values[0], 'hash' : self.calendar.entry_set.hash, 'type' : 'event'}
             self.receive(json.dumps(data))
             
