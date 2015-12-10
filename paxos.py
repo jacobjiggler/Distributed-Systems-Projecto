@@ -251,9 +251,10 @@ class Proposer(Agent):
         self.activeValue = None
         self.maxReceived = {}
         
-    def send(self, _id, port=6002, message= ""):
+    def send(self, _id, message= "", port=6002):
         global ips
         print "Sending to " + str(_id) + " " + ips[_id]
+        print message
         _id = ips[_id]
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
