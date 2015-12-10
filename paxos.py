@@ -73,17 +73,17 @@ class Agent():
         if (self.votes == []):
             self.votes = [0] * len(self.last_heartbeat)
         global ips
-        min_bday = 1000000000000000
-        min_bday_id = 0
+        min_heartbeat = 1000000000000000
+        min_hid = 0
         i = 0
-        for birthday in self.birthdays:
-            if birthday != 0 and self.last_heartbeat[i] != 0 and birthday < min_bday and (time.time() - self.last_heartbeat[i]) >= 7.5 and i != self.leader:
-                min_bday = birthday
-                min_bday_id = i
+        for heartbeat in self.last_heartbeat:
+            if heartbeat != 0 and i != self.leader and heartbeat < min_heartbeat:
+                min_heartbeat = heartbeat
+                min_hid = i
             i +=1
         
-        if min_bday_id == self.leader:
-            min_bday_id = (min_bday_id +  1) % len(self.votes)
+        if min_hid == self.leader:
+            min_hid = (min_hid +  1) % len(self.votes)
         
         for ip in ips:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -386,12 +386,12 @@ class Acceptor(Agent):
     def become_leader(self):
         global ips 
         print 'becoming leader'
-        self.heartbeat_checker.cancel()
-        self.listener.shutdown()
-        self.listener.server_close()
-        self.election_listener.shutdown()
-        self.election_listener.close()
-        self.acceptors = []
+        #self.heartbeat_checker.cancel()
+        #self.listener.shutdown()
+        #self.listener.server_close()
+        #self.election_listener.shutdown()
+        #self.election_listener.close()
+        #self.acceptors = []
         global agent
         i = 0
         for ip in ips:
