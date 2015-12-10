@@ -67,7 +67,7 @@ class Node():
     def heartbeat(self):
         for node in Node.ips:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
-            data = {'birthday':self.birthday, 'id' : self.id, 'type' : 'heartbeat'}
+            data = {'birthday':self.birthday, 'id' : self.id, 'type' : 'heartbeat', 'leader' : self.agent.leader}
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
             sock.sendto(json.dumps(data), (node, 6001))
             sock.sendto(json.dumps(data), (node, 6002))

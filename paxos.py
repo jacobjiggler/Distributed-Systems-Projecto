@@ -36,6 +36,12 @@ class AgentUDPHandler(SocketServer.BaseRequestHandler):
             if 'birthday' in data:
                 agent.birthdays[data['id']] = float(data['birthday'])
                 agent.last_heartbeat[data['id']] = time.time()
+                
+                if agent.leader != data['leader']:
+                    agent.nDiffleader += 1
+                    if agent.nDiffleader >= len(agent.votes)/2:
+                        agent.leader = data['leader']
+                        nDiffleader = 0
             else:
                 agent.receive(data)
             agent.lock.release()
@@ -45,6 +51,7 @@ class AgentUDPHandler(SocketServer.BaseRequestHandler):
 
 class Agent():
     leader = 0
+    nDiffleader = 0
     lock = Lock()
     birthdays = []
     last_heartbeat = []

@@ -37,16 +37,21 @@ class Entry():
             caltime2 = self.end.split(':')
             entime1 = entry.start.split(':')
             entime2 = entry.end.split(':')
-            c1 = int(caltime1[0])*60 + int(caltime1[1])
-            c2 = int(caltime2[0])*60 + int(caltime2[1])
-            e1 = int(entime1[0])*60 + int(entime1[1]) + 1
-            e2 = int(entime2[0])*60 + int(entime2[1]) - 1
-            if e1 > c1 and e1 < c2:
+            try:
+                c1 = int(caltime1[0])*60 + int(caltime1[1])
+                c2 = int(caltime2[0])*60 + int(caltime2[1])
+                e1 = int(entime1[0])*60 + int(entime1[1]) + 1
+                e2 = int(entime2[0])*60 + int(entime2[1]) - 1
+                if e1 > c1 and e1 < c2:
+                    return False
+                if e2 > c1 and e2 < c2:
+                    return False
+                else:
+                    return True
+            except:
                 return False
-            if e2 > c1 and e2 < c2:
+            finally:
                 return False
-            else:
-                return True
 
     @staticmethod
     def load(js):
