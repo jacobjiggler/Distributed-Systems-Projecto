@@ -93,6 +93,7 @@ class Node():
         _id = Node.ips[paxos.agent.leader]
         data = {'event':event.to_JSON(), 'hash' : self.entry_set.hash, 'type' : 'event'}
         if (paxos.agent.leader == self.id):
+            print 'sending to self'
             paxos.agent.receive(data)
             return
         
@@ -100,6 +101,7 @@ class Node():
         data = {'event':event.to_JSON(), 'hash' : self.entry_set.hash, 'type' : 'event'}
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         sock.sendto(json.dumps(data), (_id, 6001))
+        sock.close()
 
     def send_failure(self, event):
         #grab id from event
@@ -153,7 +155,7 @@ def main():
         i = 0
         acceptors = []
         for ip in Node.ips:
-            if i != self.id:
+            if i != node.id:
                 acceptors.append(i)
             i += 1
         paxos.agent = paxos.Proposer(node, acceptors)
@@ -163,7 +165,6 @@ def main():
         node.agent = paxos.agent
     if (len(argv) == 2):
         while True:
-            print "leader: " + str(paxos.agent.leader)
             print "[v] View Appointments"
             print "[a] Add Appointment"
             print "[d] Delete Appointment"

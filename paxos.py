@@ -40,8 +40,9 @@ class AgentUDPHandler(SocketServer.BaseRequestHandler):
                 if agent.leader != data['leader']:
                     agent.nDiffleader += 1
                     if agent.nDiffleader >= len(agent.votes)/2:
+                        print 'changing leader to: ' + str(data['leader'])
                         agent.leader = data['leader']
-                        nDiffleader = 0
+                        agent.nDiffleader = 0
             else:
                 agent.receive(data)
             agent.lock.release()
@@ -225,7 +226,8 @@ class Proposer(Agent):
                 if self.nAccepted >= len(self.acceptors)/2:
                     if not self.isLeader:
                         data['type'] = 'learn'
-                        self.send(leader, data, 6001)
+                        self.send(self.leader, data, 6001)
+                        return
                     event = Event.load(json.loads(self.activeValue))
                     if event.entry:
                         event.entry = Entry.load(event.entry)
@@ -234,8 +236,10 @@ class Proposer(Agent):
                         reset()
                         
                     d = json.dumps({'type' : 'learn' ,'event': event.to_JSON()})
+                    i = 0
                     for node in ips:
-                        self.send(node, d, 6000)
+                        self.send(i, d, 6000)
+                        i += 1
                         #will this work to self?
                     values.discard(self.activeValue)
                     self.calendar.add(event)
@@ -248,6 +252,7 @@ class Proposer(Agent):
         
     def send(self, _id, port=6002, message= ""):
         global ips
+        print "Sending to " + str(_id) + " " + ips[_id]
         _id = ips[_id]
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -333,6 +338,7 @@ class Acceptor(Agent):
             
     def send(self, _id, message, port=6001):
         global ips
+        print "Sending to " + str(_id) + " " + ips[_id]
         _id = ips[_id]
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
