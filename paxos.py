@@ -288,9 +288,9 @@ class Proposer(Agent):
         self.values.discard(self.activeValue)
         if self.selfnode.entry_set:
             if (event.type == 0):
-                self.selfnode.entry_set(event)
+                self.selfnode.entry_set.add(event)
             else:
-                self.selfnode.entry_set(event)
+                self.selfnode.entry_set.delete(event)
         self.reset()
         
             
