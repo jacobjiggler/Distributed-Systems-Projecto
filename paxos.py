@@ -275,7 +275,7 @@ class Acceptor(Agent):
         self.selfnode = selfnode
         self.last_heartbeat = [0] * 5
         self.heartbeat_checker = perpetualTimer(10, self.check_heartbeat)
-        self.listener = SocketServer.UDPServer(('0.0.0.0', 6001), AgentUDPHandler)
+        self.listener = SocketServer.UDPServer(('0.0.0.0', 6002), AgentUDPHandler)
         self.election_listener = SocketServer.TCPServer(('0.0.0.0', 6099), ElectionTCPHandler)
         self.thread = Thread(target = self.listener.serve_forever)
         self.thread_election = Thread(target = self.election_listener.serve_forever)
@@ -285,7 +285,7 @@ class Acceptor(Agent):
         self.votes = [0] * 5
 
     def receive(self, data):
-        print 'received: ' + str(data)
+        print 'received (accept): ' + str(data)
         if data['type'] == 'prepare':
             print 'prepare: '
             if data['n'] < promise:
