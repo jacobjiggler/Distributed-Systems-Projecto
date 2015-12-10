@@ -65,9 +65,11 @@ class Node():
         self.listener.shutdown()
         
     def heartbeat(self):
+        if paxos.agent == None:
+            return
         for node in Node.ips:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
-            data = {'birthday':self.birthday, 'id' : self.id, 'type' : 'heartbeat', 'leader' : self.agent.leader}
+            data = {'birthday':self.birthday, 'id' : self.id, 'type' : 'heartbeat', 'leader' : paxos.agent.leader}
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
             sock.sendto(json.dumps(data), (node, 6001))
             sock.sendto(json.dumps(data), (node, 6002))
@@ -159,10 +161,8 @@ def main():
                 acceptors.append(i)
             i += 1
         paxos.agent = paxos.Proposer(node, acceptors)
-        node.agent = paxos.agent
     else:
         paxos.agent = paxos.Acceptor(node)
-        node.agent = paxos.agent
     if (len(argv) == 2):
         while True:
             print "[v] View Appointments"
