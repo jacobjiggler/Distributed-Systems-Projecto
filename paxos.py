@@ -82,6 +82,9 @@ class Agent():
                 min_bday_id = i
             i +=1
         
+        if min_bday_id == self.leader:
+            min_bday_id = (min_bday_id +  1) % len(self.votes)
+        
         for ip in ips:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             try:
@@ -174,7 +177,7 @@ class Proposer(Agent):
         print 'received: ' + str(data)
         if data['type'] == 'event':
             print "Event: "
-            if self.calendar.entry_set.hash != data['hash']:
+            if self.calendar and self.calendar.entry_set and self.calendar.entry_set.hash != data['hash']:
                 sdata = {
                     'type' : 'sync',
                     'calendar' : self.calendar.toJSON()
