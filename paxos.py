@@ -199,6 +199,7 @@ class Proposer(Agent):
             
         elif data['type'] == 'promise':
             if data['responce'] == 'reject':
+                print 'rejected :()'
                 reset()
                 return
             proposal = []
@@ -315,6 +316,7 @@ class Acceptor(Agent):
         if data['type'] == 'prepare':
             print 'prepare: '
             if data['n'] < self.promise:
+                print 'REJECTED!'
                 data = {
                     'type': 'promise',
                     'responce': 'reject',
@@ -348,13 +350,13 @@ class Acceptor(Agent):
                     'responce' : 'reject'
                     }
                 self.send(data['from'], json.dumps(sdata) )
-            
-            sdata = {
-                'type': 'accepted',
-                'from': self.selfnode.id,
-                'n': data['n']
-            }
-            self.send(self.leader, json.dumps(sdata))
+            else:
+                sdata = {
+                    'type': 'accepted',
+                    'from': self.selfnode.id,
+                    'n': data['n']
+                }
+                self.send(data['from'], json.dumps(sdata))
             
     def send(self, _id, message, port=6001):
         global ips
