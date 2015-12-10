@@ -5,7 +5,7 @@ from calendar import EntrySet
 import time
 import socket
 import json
-from event import perpetualTimer
+from event import perpetualTimer, Event
 agent = None
 ips = open('ip', 'r').read().split("\n")[0:5]
 
