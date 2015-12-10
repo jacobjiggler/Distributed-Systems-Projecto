@@ -85,7 +85,10 @@ class Node():
         if data['type'] == "learn":
             event = Event.load(json.loads(data['event']))
             if event.entry and not isinstance(event.entry, Entry):
-                event.entry = Entry.load(json.loads(event.entry))
+                if isinstance(event.entry, dict):
+                    event.entry = Entry.load(event.entry)
+                else:
+                    event.entry = Entry.load(json.loads(event.entry))
             print 'learning' + str(event)
             res = event.apply(self.entry_set, self)
             if res:
