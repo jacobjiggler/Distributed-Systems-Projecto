@@ -155,6 +155,7 @@ class Proposer(Agent):
         global ips
         
         data = json.loads(data)
+        print 'received: ' + data
         if data['type'] == 'event':
             print "Event: "
             if self.calendar.entry_set.hash != data['hash']:
