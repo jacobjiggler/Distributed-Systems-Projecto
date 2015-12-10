@@ -89,7 +89,7 @@ class Node():
 
 
     def send(self, event=None):
-        _id = Node.ips[self.leader]
+        _id = Node.ips[self.agent.leader]
         
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
         data = {'event':event.to_JSON(), 'hash' : self.entry_set.hash, 'type' : 'event'}
