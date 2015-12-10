@@ -296,7 +296,7 @@ class Acceptor(Agent):
         print 'received (accept): ' + str(data)
         if data['type'] == 'prepare':
             print 'prepare: '
-            if data['n'] < promise:
+            if data['n'] < self.promise:
                 data = {
                     'type': 'promise',
                     'responce': 'reject',
@@ -311,7 +311,7 @@ class Acceptor(Agent):
                 'type': 'promise',
                 'responce' : 'promise',
                 'from': self.selfnode.id,
-                'proposals' : maxProposal,
+                'proposals' : self.maxProposal,
                 'n': data['n'],
             }
             
