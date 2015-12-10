@@ -73,22 +73,23 @@ class Agent():
         if (self.votes == []):
             self.votes = [0] * len(self.last_heartbeat)
         global ips
-        min_heartbeat = 100000000000000000.0
-        min_hid = 0
+        min_bday = 100000000000000000.0
+        min_bid = 0
         i = 0
-        for heartbeat in self.last_heartbeat:
-            if heartbeat != 0 and i != self.leader and heartbeat < min_heartbeat:
-                min_heartbeat = heartbeat
-                min_hid = i
+        for birthday in self.birthdays:
+            if birthday != 0 and i != self.leader and abs(self.last_heartbeat[i] - self.last_heartbeat[self.selfnode.id]) < 10 and birthday < min_bday:
+                min_bday = birthday
+                min_bid = i
             i +=1
         
-        if min_hid == self.leader:
-            min_hid = (min_hid +  1) % len(self.votes)
+        
+        if min_bid == self.leader:
+            min_bid = (min_bid +  1) % len(self.votes)
         
         for ip in ips:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             try:
-                data = {'vote' : min_hid}
+                data = {'vote' : min_bid}
                 sock.settimeout(3)
                 sock.connect((ip, 6099))
                 sock.sendall(json.dumps(data))
@@ -144,7 +145,10 @@ class Proposer(Agent):
     def __init__(self,  selfnode, acceptors, calendar=None):
         global ips
         self.listener = SocketServer.UDPServer(('0.0.0.0', 6001), AgentUDPHandler)
+        self.listener.allow_reuse_address = True
         self.election_listener = SocketServer.TCPServer(('0.0.0.0', 6099), ElectionTCPHandler)
+        self.election_listener.allow_reuse_address = True
+
         self.thread = Thread(target = self.listener.serve_forever)
         self.thread_election = Thread(target = self.election_listener.serve_forever)
         self.thread.start()
@@ -320,6 +324,8 @@ class Acceptor(Agent):
         self.heartbeat_checker = perpetualTimer(10, self.check_heartbeat)
         self.listener = SocketServer.UDPServer(('0.0.0.0', 6002), AgentUDPHandler)
         self.election_listener = SocketServer.TCPServer(('0.0.0.0', 6099), ElectionTCPHandler)
+        self.election_listener.allow_reuse_address = True        
+        self.listener.allow_reuse_address = True
         self.thread = Thread(target = self.listener.serve_forever)
         self.thread_election = Thread(target = self.election_listener.serve_forever)
         self.thread.start()
@@ -386,13 +392,12 @@ class Acceptor(Agent):
     def become_leader(self):
         global ips 
         print 'becoming leader'
+        self.thread.exit()
+        self.thread_election.exit()
+
         self.heartbeat_checker.cancel()
-        #self.listener.shutdown()
-        self.election_listener.shutdown = True
-        self.election_listener.server_close()
-        self.listener.shutdown = True
-        self.listener.server_close()
-        #self.election_listener.close()
+        self.listener.shutdown()
+        self.election_listener.shutdown()
         self.acceptors = []
         acceptors = []
         global agent
@@ -400,15 +405,11 @@ class Acceptor(Agent):
         for ip in ips:
             if i != self.selfnode.id:
                 acceptors.append(i)
-        print agent
-        print "?"
         p = Proposer(self.selfnode, acceptors, self.selfnode.entry_set)
         p.isLeader = True
         p.leader = self.selfnode.id
-        print agent
         agent = p
         print agent
-        print agent.__dict__
         
     
             
