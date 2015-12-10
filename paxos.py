@@ -398,6 +398,8 @@ class Acceptor(Agent):
             if i != self.selfnode.id:
                 acceptors.append(i)
         p = Proposer(self.selfnode, acceptors, self.selfnode.entry_set)
+        p.isLeader = True
+        p.leader = self.selfnode.id
         agent = p
         
     
