@@ -73,7 +73,7 @@ class Agent():
         if (self.votes == []):
             self.votes = [0] * len(self.last_heartbeat)
         global ips
-        min_heartbeat = 1000000000000000
+        min_heartbeat = 100000000000000000.0
         min_hid = 0
         i = 0
         for heartbeat in self.last_heartbeat:
@@ -88,7 +88,7 @@ class Agent():
         for ip in ips:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             try:
-                data = {'vote' : min_bday_id}
+                data = {'vote' : min_hid}
                 sock.settimeout(3)
                 sock.connect((ip, 6099))
                 sock.sendall(json.dumps(data))
