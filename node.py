@@ -91,7 +91,7 @@ class Node():
     def send(self, event=None):
         _id = Node.ips[self.agent.leader]
         data = {'event':event.to_JSON(), 'hash' : self.entry_set.hash, 'type' : 'event'}
-        print self.agent
+        print self.agent.__dict__
         print self.agent.leader
         if (self.agent.leader == self.id):
             self.agent.receive(data)

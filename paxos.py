@@ -51,10 +51,6 @@ class Agent():
         if (time.time() - self.last_heartbeat[self.leader]) >= 5:
             self.elect_leader()
 
-    listener = SocketServer.UDPServer(('0.0.0.0', 6001), AgentUDPHandler)
-    election_listener = SocketServer.TCPServer(('0.0.0.0', 6099), ElectionTCPHandler)
-    thread = Thread(target = listener.serve_forever)
-    thread_election = Thread(target = election_listener.serve_forever)
     selfnode = None
     
     
@@ -129,6 +125,13 @@ class Proposer(Agent):
     
     def __init__(self,  selfnode, acceptors, calendar=None):
         global ips
+        self.listener = SocketServer.UDPServer(('0.0.0.0', 6001), AgentUDPHandler)
+        self.election_listener = SocketServer.TCPServer(('0.0.0.0', 6099), ElectionTCPHandler)
+        self.thread = Thread(target = self.listener.serve_forever)
+        self.thread_election = Thread(target = self.election_listener.serve_forever)
+        self.thread.start()
+        self.thread_election.start()
+        
         self.acceptors = acceptors
         self.selfnode = selfnode
         self.votes = [0] * len(ips)
@@ -141,6 +144,7 @@ class Proposer(Agent):
         self.thread_election.start()
         self.birthday = time.time()
         self.ticker = Timer(5, self.tick)
+        self.ticker.start()
         
         if calendar:
             self.calendar = EntrySet.load(calendar)
@@ -259,7 +263,12 @@ class Acceptor(Agent):
         self.selfnode = selfnode
         self.last_heartbeat = [0] * 5
         self.heartbeat_checker = Timer(10, self.check_heartbeat)
-
+        self.listener = SocketServer.UDPServer(('0.0.0.0', 6001), AgentUDPHandler)
+        self.election_listener = SocketServer.TCPServer(('0.0.0.0', 6099), ElectionTCPHandler)
+        self.thread = Thread(target = self.listener.serve_forever)
+        self.thread_election = Thread(target = self.election_listener.serve_forever)
+        self.thread.start()
+        self.thread_election.start()
         self.heartbeat_checker.start()
 
     def receive(self, data):
