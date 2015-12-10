@@ -25,9 +25,6 @@ class NodeUDPHandler(SocketServer.BaseRequestHandler):
             node.receive(self.data)
         node.lock.release()
         
-def heartbeat():
-    global node
-    node.heartbeat()
 
 class Node():
     ips = []
