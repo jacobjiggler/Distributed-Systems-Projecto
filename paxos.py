@@ -191,7 +191,7 @@ class Proposer(Agent):
             data = {
                 'type': 'prepare',
                 'from': self.selfnode.id,
-                'n': n,
+                'n': self.n,
             }
             
             for acceptor in self.acceptors:
