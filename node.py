@@ -8,6 +8,8 @@ import socket
 import time
 import calendar
 import os
+import json
+
 import paxos
 from threading import Timer
 
@@ -19,7 +21,7 @@ class NodeUDPHandler(SocketServer.BaseRequestHandler):
     def handle(self):
         global node
         # self.request is the TCP socket connected to the client
-        self.data = self.request.recv(1024).strip()
+        self.data = self.request[0].recv(1024).strip()
         node.lock.acquire()
         if node:
             node.receive(self.data)

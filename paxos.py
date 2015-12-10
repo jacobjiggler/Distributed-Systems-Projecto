@@ -4,7 +4,7 @@ import SocketServer
 from calendar import EntrySet
 import time
 import socket
-
+import json
 agent = None
 ips = open('ip', 'r').read().split("\n")[0:5]
 
@@ -24,7 +24,7 @@ class ElectionTCPHandler(SocketServer.BaseRequestHandler):
 
 class AgentUDPHandler(SocketServer.BaseRequestHandler):
     def handle(self):
-        data = self.request.recv(1024).strip()
+        data = self.request[0].recv(1024).strip()
         data = json.loads(data)
         print "Received UDP: " + data
         global agent
