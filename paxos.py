@@ -418,7 +418,6 @@ class Acceptor(Agent):
         p.isLeader = True
         p.leader = self.selfnode.id
         agent = p
-        print agent
         
     
             

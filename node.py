@@ -96,6 +96,7 @@ class Node():
                 paxos.agent.events.append(event)
             
         elif data['type'] == 'sync':
+            print data['events']
             events = json.load(data['events'])
             print events 
             for e in events:
