@@ -2,6 +2,9 @@ from threading import Thread, Lock, Timer
 import Queue
 import SocketServer
 from calendar import EntrySet
+import time
+import socket
+
 agent = None
 ips = open('ip', 'r').read().split("\n")[0:4]
 
@@ -46,7 +49,6 @@ class Agent():
         if (time.time() - self.last_heartbeat[self.leader]) >= 5:
             self.elect_leader()
 
-    heartbeat_checker = Timer(10, check_heartbeat)
     listener = SocketServer.UDPServer(('0.0.0.0', 6001), AgentUDPHandler)
     election_listener = SocketServer.TCPServer(('0.0.0.0', 6099), ElectionTCPHandler)
     thread = Thread(target = listener.serve_forever)
@@ -79,7 +81,7 @@ class Agent():
                 # Node Down cancel conflict
                 pass
             finally:
-                socket.close()
+                sock.close()
             
     def receive_vote(self, vote):
         self.votes[vote] += 1
@@ -129,6 +131,8 @@ class Proposer(Agent):
         self.selfnode = selfnode
         self.votes = [0] * len(ips)
         self.n = self.selfnode.id
+        self.last_heartbeat = [0] * 5
+        self.heartbeat_checker = Timer(10, self.check_heartbeat)
         self.heartbeat_checker.start()
         self.birthdays = [0] * len(ips)
         self.thread.start()
@@ -249,6 +253,9 @@ class Acceptor(Agent):
         global ips
         self.birthdays = [0] * len(ips)
         self.selfnode = selfnode
+        self.last_heartbeat = [0] * 5
+        self.heartbeat_checker = Timer(10, self.check_heartbeat)
+
         self.heartbeat_checker.start()
 
     def receive(self, data):

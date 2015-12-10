@@ -59,14 +59,14 @@ class Node():
         self.table = TimeTable(len(Node.ips))
         self.events = []
 
-    def kill():
+    def kill(self):
         print('killin')
         self.listener.shutdown()
         
-    def heartbeat():
+    def heartbeat(self):
         for node in Node.ips:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
-            data = {'birthday':self.birthdate, 'id' : self.id, 'type' : 'heartbeat'}
+            data = {'birthday':self.birthday, 'id' : self.id, 'type' : 'heartbeat'}
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             sock.sendto(json.dumps(data), (node, 6001))
             sock.sendto(json.dumps(data), (node, 6002))
