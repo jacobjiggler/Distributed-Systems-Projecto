@@ -51,7 +51,7 @@ class Agent():
         self.last_heartbeat[self.selfnode.id] = time.time()
         if self.leader == self.selfnode.id:
             return
-        if (time.time() - self.last_heartbeat[self.leader]) >= 5:
+        if (time.time() - self.last_heartbeat[self.leader]) >= 7:
             print "tdiff:" + str(time.time() - self.last_heartbeat[self.leader])
             self.elect_leader()
 
@@ -332,12 +332,12 @@ class Acceptor(Agent):
     def become_leader(self):
         global ips 
         print 'becoming leader'
-        heartbeat_checker.stop()
-        listener.shutdown()
-        listener.server_close()
-        election_listener.shutdown()
-        election_listener.close()
-        acceptors = []
+        self.heartbeat_checker.stop()
+        self.listener.shutdown()
+        self.listener.server_close()
+        self.election_listener.shutdown()
+        self.election_listener.close()
+        self.acceptors = []
         global agent
         i = 0
         for ip in ips:
