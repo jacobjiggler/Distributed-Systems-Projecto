@@ -24,7 +24,7 @@ class ElectionTCPHandler(SocketServer.BaseRequestHandler):
 
 class AgentUDPHandler(SocketServer.BaseRequestHandler):
     def handle(self):
-        data = self.request[0].recv(1024).strip()
+        data = self.request[0].strip()
         data = json.loads(data)
         print "Received UDP: " + data
         global agent
