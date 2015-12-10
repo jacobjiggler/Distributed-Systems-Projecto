@@ -170,7 +170,7 @@ class Proposer(Agent):
         self.ticker.start()
         self.current_n = 0
         if calendar:
-            if isinstance(EntrySet, calendar):
+            if isinstance(calendar, EntrySet):
                 self.calendar = calendar
             else:
                 self.calendar = EntrySet.load(calendar)
