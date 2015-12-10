@@ -248,7 +248,7 @@ class Proposer(Agent):
         if event.entry:
             event.entry = Entry.load(event.entry)
         if not self.selfnode.entry_set.check(event.entry):
-            values.discard(self.activeValue)
+            self.values.discard(self.activeValue)
             reset()
             
         d = json.dumps({'type' : 'learn' ,'event': event.to_JSON()})
@@ -261,7 +261,7 @@ class Proposer(Agent):
                 self.send(i, d, 6000)
             i += 1
             #will this work to self?
-        values.discard(self.activeValue)
+        self.values.discard(self.activeValue)
         if (event.type == 0):
             self.calendar.add(event)
         else:
